@@ -155,7 +155,7 @@
       const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
       const resJson = await res.json();
       if(resJson.result === "SUCCESS") {
-        alert("申し込みが完了しました。カウンターへお越しください。");
+        alert("申し込みが完了しました。発送準備をお願いいたします。");
         location.reload();
       } else { alert("保存に失敗しました: " + resJson.result); }
     } catch(err) { alert("送信に失敗しました。電波を確認してください。"); }
