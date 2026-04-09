@@ -49,10 +49,13 @@
         <button id="v-grid" class="view-btn" onclick="switchView('grid')"><i class="bi bi-grid-fill"></i></button>
       </div>
     </div>
+    
     <div class="p-2 bg-light rounded mb-2 d-flex align-items-center gap-2 shadow-sm overflow-auto">
       <button class="btn btn-primary btn-sm fw-bold text-nowrap" onclick="createNewCase()">新規+</button>
+      <button class="btn btn-warning btn-sm fw-bold text-nowrap" onclick="callWaitingList()"><i class="bi bi-person-lines-fill"></i> 受付中</button>
       <div id="case-list-area" class="d-flex"></div>
     </div>
+
     <div class="row g-1 mb-2">
       <div class="col-6"><input type="text" id="cust-name" class="form-control form-control-sm" placeholder="お客様名" oninput="autoUpdateCaseName()"></div>
       <div class="col-6"><input type="tel" id="cust-tel" class="form-control form-control-sm" placeholder="連絡先" oninput="saveCurrentCase()"></div>
@@ -95,7 +98,6 @@
 <div id="imageModal" onclick="this.style.display='none'"><img id="modalImg" style="max-width:90%; max-height:90%;"></div>
 
 <script>
-  // ★GASのURLをセット済み
   const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwi7tWn74PWL-HD59oj7p1DZDdfddMn4wdJRJCCZJKznuBSLZ6GA88W6Lp-g1RrFkkSOw/exec";
 
   let cards = [], inputs = {}, activeCaseId = "default", cases = {}, currentFilter = "", currentView = "table";
@@ -156,7 +158,6 @@
     let q = (inputs[key]?.q || 0) + delta;
     if (q <= 0) delete inputs[key]; else inputs[key] = { n: name, t: type, p: price, q: q };
     saveCurrentCase(); calc();
-    // 部分更新
     document.querySelectorAll(`[data-ctrl-key="${key}"]`).forEach(el => {
       el.classList.toggle('has-value', q > 0);
       el.querySelector('input').value = q > 0 ? q : 0;
@@ -208,6 +209,38 @@
     }
   }
 
+  // 受付待機リストを呼び出す
+  async function callWaitingList() {
+    const res = await fetch(GAS_API_URL + "?action=getWaiting");
+    const list = await res.json();
+    if (list.length === 0) { alert("待機中のお客様はいません。"); return; }
+
+    let html = '<div class="list-group">';
+    list.forEach((c, i) => {
+      html += `<button type="button" class="list-group-item list-group-item-action" onclick="applyCustomerDetail(${i})">
+        <b>${c.name} 様</b> (${c.tel})<br><small>${c.addressText || '住所入力なし'}</small>
+      </button>`;
+    });
+    html += '</div>';
+
+    const div = document.createElement('div');
+    div.id = "waiting-modal";
+    div.style = "position:fixed; top:15%; left:5%; width:90%; max-height:70%; overflow-y:auto; background:white; border:2px solid #0d124a; z-index:9999; padding:20px; border-radius:10px; box-shadow:0 0 50px rgba(0,0,0,0.5)";
+    div.innerHTML = `<h5>受付待機リスト</h5>${html}<br><button class="btn btn-secondary w-100" onclick="document.getElementById('waiting-modal').remove()">閉じる</button>`;
+    document.body.appendChild(div);
+
+    window.applyCustomerDetail = (idx) => {
+      const c = list[idx];
+      document.getElementById('cust-name').value = c.name;
+      document.getElementById('cust-tel').value = c.tel;
+      // 内部データとして一時保存（確定時に送信するため）
+      inputs._customerDetail = c; 
+      saveCurrentCase();
+      document.getElementById('waiting-modal').remove();
+      alert(c.name + " 様のデータを読み込みました。査定を開始してください。");
+    };
+  }
+
   function finalizeTrade() {
     if(!Object.values(inputs).some(i=>i.q>0)) { alert("入力がありません"); return; }
     if(!confirm("スプレッドシートに保存して査定を確定しますか？")) return;
@@ -218,6 +251,8 @@
     const tradeData = {
       customerName: document.getElementById('cust-name').value || "未入力",
       tel: document.getElementById('cust-tel').value || "",
+      // 受付リストから読み込んでいた場合はその詳細を含める
+      customerDetail: inputs._customerDetail || null,
       totalQty: document.getElementById('t-qty').innerText,
       totalAmount: document.getElementById('t-amt').innerText.replace(/,/g, ''),
       items: Object.values(inputs).filter(i => i.q > 0)
