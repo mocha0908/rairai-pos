@@ -3,38 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AR ASSESSMENT Pro - Enterprise</title>
+  <title>AR ASSESSMENT Pro - POS</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <style>
-    :root { --primary: #0d124a; --accent: #facc15; --bg: #f4f7f9; --rank-s: #f1f5f9; --rank-a: #fef3c7; --rank-b: #ecfdf5; --rank-c: #fff1f2; --rank-d: #f5f3ff; }
-    body { background: var(--bg); color: #1e293b; font-family: 'Meiryo', sans-serif; padding-bottom: 140px; overflow-x: hidden; }
+    :root { --primary: #0d124a; --accent: #facc15; --bg: #f4f7f9; }
+    body { background: var(--bg); color: #1e293b; font-family: 'Meiryo', sans-serif; padding-bottom: 140px; }
     .sticky-top { background: rgba(255, 255, 255, 0.95) !important; backdrop-filter: blur(10px); border-bottom: 3px solid var(--primary); z-index: 1020; }
-    .view-switch { background: #e2e8f0; border-radius: 8px; padding: 2px; display: inline-flex; }
-    .view-btn { border: none; background: transparent; padding: 4px 10px; border-radius: 6px; cursor: pointer; color: #718096; }
-    .view-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .case-badge { border: none; padding: 6px 12px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; margin: 2px; position: relative; cursor: pointer; }
-    .case-badge.active { background: var(--primary) !important; color: white; }
+    .case-badge { border: none; padding: 6px 12px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; margin: 2px; cursor: pointer; border: 1px solid #ddd; background: white; }
+    .case-badge.active { background: var(--primary); color: white; border-color: var(--primary); }
     .waiting-badge { background: #ffc107; color: #000; border: 1px dashed #000; animation: blink 2s infinite; }
     @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
     .main-table-container { background: #fff; border-radius: 15px; margin: 10px; border: 1px solid #ddd; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-    .main-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    .main-table th { background: #f8fafc; color: #64748b; font-size: 0.7rem; padding: 12px; border-bottom: 2px solid #eee; text-align: center; position: sticky; top: 0; z-index: 10; }
+    .main-table { width: 100%; border-collapse: collapse; }
+    .main-table th { background: #f8fafc; font-size: 0.7rem; padding: 12px; border-bottom: 2px solid #eee; text-align: center; }
     .main-table td { padding: 8px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
-    .main-table tr.has-value { background-color: #fffde7 !important; }
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding: 10px; }
-    .grid-item { background: white; border-radius: 12px; padding: 10px; border: 1px solid #ddd; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-    .grid-item.has-value { border: 2px solid var(--primary); background: #fffde7; }
-    .grid-img-container { width: 100%; height: 110px; margin-bottom: 10px; display: flex; justify-content: center; }
-    .grid-img-container img { height: 100%; object-fit: contain; cursor: zoom-in; }
-    .rank-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; gap: 4px; }
-    .price-label { font-weight: bold; font-size: 0.7rem; color: #333; flex: 1; white-space: nowrap; }
-    .qty-ctrl { display: flex; align-items: center; background: #eee; border-radius: 6px; padding: 1px; border: 1px solid #ccc; width: fit-content; }
-    .qty-ctrl.has-value { background: var(--primary); color: white; border-color: var(--primary); }
-    .qty-btn { border: none; background: transparent; color: inherit; width: 26px; height: 26px; font-weight: bold; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
-    .qty-num { width: 34px; border: none; background: #fff; text-align: center; font-weight: 900; border-radius: 4px; height: 24px; font-size: 0.95rem; padding: 0; margin: 0 1px; }
+    .qty-ctrl { display: flex; align-items: center; background: #eee; border-radius: 6px; padding: 1px; width: fit-content; }
+    .qty-ctrl.has-value { background: var(--primary); color: white; }
+    .qty-btn { border: none; background: transparent; color: inherit; width: 26px; height: 26px; font-weight: bold; cursor: pointer; }
+    .qty-num { width: 34px; border: none; background: #fff; text-align: center; font-weight: 900; height: 24px; border-radius: 4px; font-size: 0.9rem; }
     .footer-bar { position: fixed; bottom: 0; width: 100%; background: var(--primary); color: #fff; padding: 15px 20px; z-index: 2000; border-radius: 20px 20px 0 0; }
-    .total-price { font-size: 2rem; font-weight: 900; color: var(--accent); }
     #receipt { display: none; background: white; padding: 30px; }
     #imageModal { display:none; position:fixed; z-index:5000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; }
     @media print { .no-print { display: none !important; } #receipt { display: block !important; } }
@@ -43,114 +31,97 @@
 <body>
 
 <div class="container-fluid no-print" id="main-ui">
-  <div class="sticky-top p-3 mb-2 shadow-sm">
+  <div class="sticky-top p-3 shadow-sm">
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <div class="fw-bold fs-5"><i class="bi bi-cpu-fill"></i> AR買取 POS Pro</div>
-      <div class="view-switch">
-        <button id="v-table" class="view-btn active" onclick="switchView('table')"><i class="bi bi-table"></i></button>
-        <button id="v-grid" class="view-btn" onclick="switchView('grid')"><i class="bi bi-grid-fill"></i></button>
+      <div class="fw-bold fs-5">AR ASSESSMENT Pro</div>
+      <div class="btn-group shadow-sm">
+        <button id="v-table" class="btn btn-outline-dark btn-sm active" onclick="switchView('table')">リスト形式</button>
+        <button id="v-grid" class="btn btn-outline-dark btn-sm" onclick="switchView('grid')">タイル形式</button>
       </div>
     </div>
-    
-    <div class="p-1 bg-light rounded mb-2 d-flex align-items-center gap-1 shadow-sm overflow-auto">
+    <div class="p-1 bg-light rounded d-flex align-items-center gap-1 overflow-auto mb-2">
       <button class="btn btn-primary btn-sm fw-bold text-nowrap" onclick="createNewCase()">新規+</button>
-      <div style="height: 20px; width: 1px; background: #ccc; margin: 0 5px;"></div>
-      <div id="waiting-area" class="d-flex align-items-center"></div> 
-      <div style="height: 20px; width: 1px; background: #ccc; margin: 0 5px;"></div>
-      <div id="case-list-area" class="d-flex"></div>
+      <div id="waiting-area" class="d-flex"></div>
+      <div id="case-list-area" class="d-flex ms-2 border-start ps-2"></div>
     </div>
-
     <div class="row g-1 mb-2">
-      <div class="col-6"><input type="text" id="cust-name" class="form-control form-control-sm" placeholder="お客様名" oninput="autoUpdateCaseName()"></div>
-      <div class="col-6"><input type="tel" id="cust-tel" class="form-control form-control-sm" placeholder="連絡先" oninput="saveCurrentCase()"></div>
+      <div class="col-6"><input type="text" id="cust-name" class="form-control form-control-sm" placeholder="氏名" oninput="autoUpdateCaseName()"></div>
+      <div class="col-6"><input type="tel" id="cust-tel" class="form-control form-control-sm" placeholder="電話番号" oninput="saveCurrentCase()"></div>
     </div>
-    <div class="d-flex gap-1">
-      <input type="text" id="search" class="form-control form-control-sm" placeholder="検索..." oninput="draw()">
-      <button class="btn btn-dark btn-sm px-3 fw-bold text-nowrap" onclick="showReceipt()">明細確認</button>
+    <div class="d-flex gap-1 mb-2">
+      <input type="text" id="search" class="form-control form-control-sm" placeholder="カードを検索..." oninput="draw()">
+      <button class="btn btn-dark btn-sm px-3 fw-bold" onclick="showReceipt()">明細確認</button>
       <button class="btn btn-outline-dark btn-sm" onclick="toggleHistory()"><i class="bi bi-clock-history"></i></button>
     </div>
-    <div id="filter-btns" class="d-flex flex-wrap gap-1 mt-2 justify-content-center"></div>
+    <div id="filter-btns" class="d-flex flex-wrap gap-1 justify-content-center"></div>
   </div>
-  <div id="display-container"><div class="text-center p-5 text-muted">読み込み中...</div></div>
+  <div id="display-container"></div>
 </div>
 
 <div id="historyPanel" style="position: fixed; top: 0; right: -350px; width: 350px; height: 100%; background: white; z-index: 3000; box-shadow: -5px 0 20px rgba(0,0,0,0.1); transition: 0.3s; padding: 20px; overflow-y: auto;">
-  <div class="d-flex justify-content-between align-items-center mb-4"><h5 class="fw-bold m-0">最近の履歴</h5><button class="btn-close" onclick="toggleHistory()"></button></div>
+  <div class="d-flex justify-content-between align-items-center mb-4"><h5 class="fw-bold m-0">最近の買取履歴</h5><button class="btn-close" onclick="toggleHistory()"></button></div>
   <div id="history-list"></div>
 </div>
 
 <div id="receipt" class="container">
-  <div class="text-center mb-4"><h3 class="fw-bold">買取査定明細書</h3><div id="receipt-date" class="text-muted small"></div></div>
-  <div id="receipt-meta" class="mb-4 p-2 bg-light rounded-2 fw-bold"></div>
-  <table class="table align-middle border table-sm">
-    <thead class="table-dark"><tr><th>カード名</th><th class="text-center">状態</th><th class="text-end">単価</th><th class="text-center">枚数</th><th class="text-end">小計</th></tr></thead>
+  <div class="text-center mb-4"><h3 class="fw-bold">カード買取査定明細</h3><div id="receipt-date"></div></div>
+  <div id="receipt-meta" class="mb-4 p-2 bg-light rounded fw-bold"></div>
+  <table class="table table-sm border align-middle">
+    <thead class="table-dark"><tr><th>カード</th><th class="text-center">ランク</th><th class="text-end">単価</th><th class="text-center">枚数</th><th class="text-end">小計</th></tr></thead>
     <tbody id="r-body"></tbody>
-    <tfoot class="fs-5 fw-bold"><tr><td colspan="4" class="text-end">合計査定金額</td><td id="r-total-amt" class="text-end text-danger"></td></tr></tfoot>
+    <tfoot class="fs-4 fw-bold"><tr><td colspan="4" class="text-end">合計査定金額</td><td id="r-total-amt" class="text-end text-danger"></td></tr></tfoot>
   </table>
   <div class="no-print mt-4 d-flex flex-column gap-2">
-    <button class="btn btn-success btn-lg py-3 fw-bold" onclick="window.print()">印刷 / PDF保存</button>
-    <button class="btn btn-primary btn-lg py-3 fw-bold" id="confirm-btn" onclick="finalizeTrade()">買取を確定する</button>
-    <button class="btn btn-outline-secondary" onclick="hideReceipt()">編集に戻る</button>
+    <button class="btn btn-success btn-lg py-3 fw-bold shadow" onclick="window.print()">印刷 / PDFとして保存</button>
+    <button class="btn btn-primary btn-lg py-3 fw-bold shadow" id="confirm-btn" onclick="finalizeTrade()">買取を確定してログに保存</button>
+    <button class="btn btn-outline-secondary" onclick="hideReceipt()">編集画面に戻る</button>
   </div>
 </div>
 
 <div class="footer-bar no-print d-flex justify-content-between align-items-center shadow-lg">
-  <div><span class="total-price">¥<span id="t-amt">0</span></span><span class="ms-2 badge bg-white text-dark rounded-pill"><span id="t-qty">0</span>枚</span></div>
-  <button class="btn btn-outline-warning rounded-pill fw-bold" onclick="resetAll()">リセット</button>
+  <div class="mb-0"><span style="font-size:1.8rem; font-weight:900; color:var(--accent);">¥<span id="t-amt">0</span></span> <span class="ms-2 badge bg-white text-dark rounded-pill"><span id="t-qty">0</span>枚</span></div>
+  <button class="btn btn-outline-warning btn-sm rounded-pill fw-bold" onclick="resetAll()">リセット</button>
 </div>
 
 <div id="imageModal" onclick="this.style.display='none'"><img id="modalImg" style="max-width:90%; max-height:90%;"></div>
 
 <script>
-  const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwi7tWn74PWL-HD59oj7p1DZDdfddMn4wdJRJCCZJKznuBSLZ6GA88W6Lp-g1RrFkkSOw/exec";
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbwi7tWn74PWL-HD59oj7p1DZDdfddMn4wdJRJCCZJKznuBSLZ6GA88W6Lp-g1RrFkkSOw/exec";
   let cards = [], inputs = {}, activeCaseId = "default", cases = {}, currentFilter = "", currentView = "table", waitingList = [];
   let historyLogs = JSON.parse(localStorage.getItem('ar_history_logs_final') || "[]");
-  const filterMap = { "あ": "^[あいうえお]", "か": "^[かきくけこがぎぐげご]", "さ": "^[さしすせそざじずぜぞ]", "た": "^[たちつてとだぢづでど]", "な": "^[なにぬねの]", "は": "^[はひふへほばびぶべぼぱぴぷぺぽ]", "ま": "^[まみむめも]", "や": "^[やゆよ]", "ら": "^[らりるれろ]", "わ": "^[わをん]" };
+  const filterMap = { "あ": "^[あいうえおアイウエオ]", "か": "^[かきくけこがぎぐげごカキクケコガギグゲゴ]", "さ": "^[さしすせそざじずぜぞサシスセソザジズゼゾ]", "た": "^[たちつてとだぢづでどタチツテトダヂヅデド]", "な": "^[なにぬねのナニヌネノ]", "は": "^[はひふへほハヒフヘホ]", "ま": "^[まみむめもマミムメモ]", "や": "^[やゆよヤユヨ]", "ら": "^[らりるれろラリルレロ]", "わ": "^[わをんワヲン]" };
 
   window.onload = () => {
-    const btnArea = document.getElementById('filter-btns');
     ["ALL", ...Object.keys(filterMap)].forEach(l => {
       const b = document.createElement('button');
       b.className = `filter-btn btn btn-outline-secondary btn-sm m-1 ${l === "ALL" ? "active" : ""}`; b.innerText = l;
-      b.onclick = function() { 
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active')); 
-        this.classList.add('active'); currentFilter = (l === "ALL") ? "" : filterMap[l]; draw(); 
-      };
-      btnArea.appendChild(b);
+      b.onclick = function() { document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active')); this.classList.add('active'); currentFilter = (l === "ALL") ? "" : filterMap[l]; draw(); };
+      document.getElementById('filter-btns').appendChild(b);
     });
     initData();
-    fetch(GAS_API_URL).then(res => res.json()).then(d => { cards = d; draw(); });
-    refreshWaiting(); setInterval(refreshWaiting, 15000);
+    fetch(GAS_URL).then(res => res.json()).then(d => { cards = d; draw(); });
+    setInterval(refreshWaiting, 15000); refreshWaiting();
   };
 
   async function refreshWaiting() {
     try {
-      const res = await fetch(GAS_API_URL + "?action=getWaiting");
+      const res = await fetch(GAS_URL + "?action=getWaiting");
       waitingList = await res.json();
-      document.getElementById('waiting-area').innerHTML = waitingList.map((c, i) => 
-        `<button class="case-badge waiting-badge" onclick="importWaiting(${i})"><i class="bi bi-clock"></i> ${c.name.substr(0,4)}</button>`
-      ).join('');
+      document.getElementById('waiting-area').innerHTML = waitingList.map((c, i) => `<button class="case-badge waiting-badge" onclick="importWaiting(${i})"><i class="bi bi-clock"></i> ${c.name.substr(0,4)}</button>`).join('');
     } catch(e){}
   }
 
   function importWaiting(idx) {
-    const c = waitingList[idx];
-    if(!confirm(c.name + " 様の受付データを読み込みますか？")) return;
+    const c = waitingList[idx]; if(!confirm(c.name + " 様を読み込みますか？")) return;
     const id = "c_" + Date.now();
     cases[id] = { name: c.name, tel: c.tel, data: { _customerDetail: c } };
-    localStorage.setItem('ar_pro_storage', JSON.stringify(cases));
-    loadCase(id);
+    localStorage.setItem('ar_pro_storage', JSON.stringify(cases)); loadCase(id);
   }
 
   function initData() {
     const saved = localStorage.getItem('ar_pro_storage');
-    if (saved) {
-      cases = JSON.parse(saved);
-      activeCaseId = localStorage.getItem('ar_pro_active_id') || Object.keys(cases)[0];
-    } else {
-      cases = { "default": { name: "新規", tel: "", data: {} } };
-      activeCaseId = "default";
-    }
+    if (saved) { cases = JSON.parse(saved); activeCaseId = localStorage.getItem('ar_pro_active_id') || Object.keys(cases)[0]; }
+    else { cases = { "default": { name: "新規", tel: "", data: {} } }; activeCaseId = "default"; }
     loadCase(activeCaseId);
   }
 
@@ -181,19 +152,11 @@
       el.classList.toggle('has-value', q > 0);
       el.querySelector('input').value = q > 0 ? q : 0;
     });
-    const isAny = ['S','A','B','C','D'].some(t => inputs[name+'-'+t]?.q > 0);
-    document.querySelectorAll(`[data-row-name="${name}"]`).forEach(el => el.classList.toggle('has-value', isAny));
-  }
-
-  function manualQty(name, type, price, val) {
-    const key = name + '-' + type; let q = parseInt(val) || 0;
-    if (q <= 0) delete inputs[key]; else inputs[key] = { n: name, t: type, p: price, q: q };
-    saveCurrentCase(); calc();
   }
 
   function calc() {
     let tq = 0, ta = 0; Object.values(inputs).forEach(i => { if(i.q){ tq += i.q; ta += (i.q * i.p); } });
-    document.getElementById('t-qty').innerText = tq; 
+    document.getElementById('t-qty').innerText = tq;
     document.getElementById('t-amt').innerText = ta.toLocaleString();
   }
 
@@ -204,34 +167,32 @@
     const filtered = cards.filter(c => c.isFixed || (c.name.toLowerCase().includes(sw) && (currentFilter === "" || new RegExp(currentFilter).test(c.name))));
     
     if (currentView === 'table') {
-      let html = `<div class="main-table-container"><table class="main-table"><thead><tr><th style="width:30%">カード名</th><th>S</th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody>`;
+      let html = `<div class="main-table-container"><table class="main-table"><thead><tr><th style="width:30%">カード</th><th>S</th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody>`;
       html += filtered.map(c => {
         const has = ['S','A','B','C','D'].some(t => inputs[c.name+'-'+t]?.q > 0);
         const cells = ['S','A','B','C','D'].map(t => {
           const q = inputs[c.name+'-'+t]?.q || 0;
-          return `<td><div class="rank-row"><span class="price-label">¥${c['price'+t]}</span><div class="qty-ctrl ${q>0?'has-value':''}" data-ctrl-key="${c.name}-${t}"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},-1)">-</button><input type="number" class="qty-num" value="${q}" oninput="manualQty('${c.name}','${t}',${c['price'+t]},this.value)"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},1)">+</button></div></div></td>`;
+          return `<td><div class="qty-ctrl ${q>0?'has-value':''}" data-ctrl-key="${c.name}-${t}"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},-1)">-</button><input type="number" class="qty-num" value="${q}"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},1)">+</button></div><div class="small text-center mt-1">¥${c['price'+t]}</div></td>`;
         }).join('');
-        return `<tr data-row-name="${c.name}" class="${has?'has-value':''}"><td><div class="d-flex align-items-center gap-2"><img src="${c.image}" style="width:40px;height:55px;object-fit:contain" onclick="zoom('${c.image}')"><div class="fw-bold small">${c.name}</div></div></td>${cells}</tr>`;
+        return `<tr class="${has?'bg-warning bg-opacity-10':''}"><td><div class="d-flex align-items-center gap-1"><img src="${c.image}" style="width:35px" onclick="zoom('${c.image}')"><span class="small fw-bold">${c.name}</span></div></td>${cells}</tr>`;
       }).join('');
       container.innerHTML = html + `</tbody></table></div>`;
     } else {
-      container.innerHTML = `<div class="card-grid">` + filtered.map(c => {
+      container.innerHTML = `<div class="card-grid p-2 d-flex flex-wrap gap-2">` + filtered.map(c => {
         const has = ['S','A','B','C','D'].some(t => inputs[c.name+'-'+t]?.q > 0);
-        const ctrls = ['S','A','B','C','D'].map(t => {
+        return `<div class="card shadow-sm p-2 ${has?'border-primary':''}" style="width:180px;"><img src="${c.image}" style="height:120px;object-fit:contain;" onclick="zoom('${c.image}')"><div class="small fw-bold text-center my-1">${c.name}</div>` + 
+        ['S','A','B','C','D'].map(t => {
           const q = inputs[c.name+'-'+t]?.q || 0;
-          return `<div class="rank-row"><span class="price-label">${t}: ¥${c['price'+t]}</span><div class="qty-ctrl ${q>0?'has-value':''}" data-ctrl-key="${c.name}-${t}"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},-1)">-</button><input type="number" class="qty-num" value="${q}" oninput="manualQty('${c.name}','${t}',${c['price'+t]},this.value)"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},1)">+</button></div></div>`;
-        }).join('');
-        return `<div class="grid-item ${has?'has-value':''}" data-row-name="${c.name}">
-          <div class="grid-img-container"><img src="${c.image}" onclick="zoom('${c.image}')"></div>
-          <div class="fw-bold small mb-2 text-center" style="height:2.4em; overflow:hidden;">${c.name}</div>${ctrls}</div>`;
+          return `<div class="d-flex justify-content-between align-items-center mb-1 small"><span>${t}:¥${c['price'+t]}</span><div class="qty-ctrl ${q>0?'has-value':''}"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},-1)">-</button><input type="number" class="qty-num" value="${q}" style="width:25px"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},1)">+</button></div></div>`;
+        }).join('') + `</div>`;
       }).join('') + `</div>`;
     }
   }
 
   function finalizeTrade() {
-    if(!confirm("保存して確定しますか？")) return;
+    if(!confirm("買取を確定して保存しますか？")) return;
     const btn = document.getElementById('confirm-btn');
-    btn.disabled = true; btn.innerHTML = '送信中...';
+    btn.disabled = true; btn.innerText = "保存中...";
     const tradeData = {
       customerName: document.getElementById('cust-name').value || "未入力",
       tel: document.getElementById('cust-tel').value || "",
@@ -240,19 +201,17 @@
       totalAmount: document.getElementById('t-amt').innerText.replace(/,/g, ''),
       items: Object.values(inputs).filter(i => i.q > 0)
     };
-    fetch(GAS_API_URL, { method: "POST", body: JSON.stringify(tradeData) })
+    fetch(GAS_URL, { method: "POST", body: JSON.stringify(tradeData) })
     .then(res => res.json()).then(res => {
       if(res.result === "SUCCESS") {
         historyLogs.unshift({ ...tradeData, date: new Date().toLocaleString() });
         localStorage.setItem('ar_history_logs_final', JSON.stringify(historyLogs.slice(0, 20)));
-        alert("保存完了しました。");
-        delete cases[activeCaseId]; initData(); hideReceipt(); refreshWaiting();
-      } else { alert("エラー: " + res.result); }
-    }).catch(e => alert("保存失敗"))
-    .finally(() => { btn.disabled = false; btn.innerHTML = '買取を確定する'; });
+        alert("保存完了"); delete cases[activeCaseId]; initData(); hideReceipt(); refreshWaiting();
+      }
+    }).catch(e => alert("保存失敗")).finally(() => { btn.disabled = false; btn.innerText = "買取を確定"; });
   }
 
-  function switchView(v) { currentView = v; document.getElementById('v-table').classList.toggle('active', v==='table'); document.getElementById('v-grid').classList.toggle('active', v==='grid'); draw(); }
+  function switchView(v) { currentView = v; draw(); }
   function showReceipt() { document.getElementById('main-ui').style.display='none'; document.getElementById('receipt').style.display='block'; refreshReceiptTable(); }
   function hideReceipt() { document.getElementById('receipt').style.display='none'; document.getElementById('main-ui').style.display='block'; }
   function refreshReceiptTable() {
@@ -260,16 +219,16 @@
     Object.values(inputs).filter(i=>i.q>0).forEach(i => {
       b.innerHTML += `<tr><td>${i.n}</td><td class="text-center">${i.t}</td><td class="text-end">¥${i.p.toLocaleString()}</td><td class="text-center">${i.q}</td><td class="text-end">¥${(i.q*i.p).toLocaleString()}</td></tr>`;
     });
-    document.getElementById('r-total-amt').innerText = "¥" + document.getElementById('t-amt').innerText;
-    document.getElementById('receipt-meta').innerText = `顧客名: ${document.getElementById('cust-name').value} 様 / TEL: ${document.getElementById('cust-tel').value}`;
+    document.getElementById('r-total-amt').innerText = document.getElementById('t-amt').innerText;
+    document.getElementById('receipt-meta').innerText = document.getElementById('cust-name').value + " 様";
     document.getElementById('receipt-date').innerText = new Date().toLocaleString();
   }
   function updateCaseListUI() {
     const area = document.getElementById('case-list-area'); area.innerHTML = "";
     Object.keys(cases).forEach(id => {
       const b = document.createElement('button');
-      b.className = `case-badge ${id === activeCaseId ? 'active' : 'bg-white border text-dark'}`;
-      b.innerHTML = `${cases[id].name} <span style="font-size:10px; opacity:0.6" onclick="deleteCase(event,'${id}')">✕</span>`;
+      b.className = `case-badge ${id === activeCaseId ? 'active' : ''}`;
+      b.innerHTML = `${cases[id].name} <span onclick="deleteCase(event,'${id}')">×</span>`;
       b.onclick = () => loadCase(id);
       area.appendChild(b);
     });
@@ -277,12 +236,12 @@
   function createNewCase() { const id = "c_"+Date.now(); cases[id] = {name:"新規",tel:"",data:{}}; loadCase(id); }
   function deleteCase(e, id) { e.stopPropagation(); if(Object.keys(cases).length<=1) return; delete cases[id]; if(activeCaseId===id) activeCaseId=Object.keys(cases)[0]; saveCurrentCase(); updateCaseListUI(); loadCase(activeCaseId); }
   function autoUpdateCaseName() { saveCurrentCase(); updateCaseListUI(); }
-  function resetAll() { if(confirm('入力を消去しますか？')) { inputs={}; saveCurrentCase(); draw(); calc(); } }
+  function resetAll() { if(confirm('データをリセットしますか？')) { inputs={}; saveCurrentCase(); draw(); calc(); } }
   function zoom(url) { document.getElementById('modalImg').src = url; document.getElementById('imageModal').style.display = 'flex'; }
   function toggleHistory() {
     const p = document.getElementById('historyPanel'); p.style.right = (p.style.right === '0px') ? '-350px' : '0px';
     const list = document.getElementById('history-list');
-    list.innerHTML = historyLogs.map(h => `<div class="card mb-2 p-2 small border-0 bg-light"><div class="text-muted" style="font-size:10px">${h.date}</div><div class="fw-bold">${h.customerName}</div><div>${h.totalQty}点 / ¥${parseInt(h.totalAmount).toLocaleString()}</div></div>`).join('') || "履歴なし";
+    list.innerHTML = historyLogs.map(h => `<div class="card mb-2 p-2 small"><div class="text-muted" style="font-size:10px">${h.date}</div><div class="fw-bold">${h.customerName}</div><div>${h.totalQty}枚 / ¥${parseInt(h.totalAmount).toLocaleString()}</div></div>`).join('') || "履歴なし";
   }
 </script>
 </body>
