@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AR ASSESSMENT Pro - Enterprise</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    :root { --primary: #0d124a; --accent: #facc15; --bg: #f4f7f9; --rank-s: #f1f5f9; --rank-a: #fef3c7; --rank-b: #ecfdf5; --rank-c: #fff1f2; --rank-d: #f5f3ff; }
+    body { background: var(--bg); color: #1e293b; font-family: 'Meiryo', sans-serif; padding-bottom: 140px; overflow-x: hidden; }
+    .sticky-top { background: rgba(255, 255, 255, 0.95) !important; backdrop-filter: blur(10px); border-bottom: 3px solid var(--primary); z-index: 1020; }
+    .view-switch { background: #e2e8f0; border-radius: 8px; padding: 2px; display: inline-flex; }
+    .view-btn { border: none; background: transparent; padding: 4px 10px; border-radius: 6px; cursor: pointer; color: #718096; }
+    .view-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .case-badge { border: none; padding: 6px 12px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; margin: 2px; position: relative; }
+    .case-badge.active { background: var(--primary) !important; color: white; }
+    .main-table-container { background: #fff; border-radius: 15px; margin: 10px; border: 1px solid #ddd; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+    .main-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .main-table th { background: #f8fafc; color: #64748b; font-size: 0.7rem; padding: 12px; border-bottom: 2px solid #eee; text-align: center; position: sticky; top: 0; z-index: 10; }
+    .main-table td { padding: 8px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+    .main-table tr.has-value { background-color: #fffde7 !important; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding: 10px; }
+    .grid-item { background: white; border-radius: 12px; padding: 10px; border: 1px solid #ddd; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .grid-item.has-value { border: 2px solid var(--primary); background: #fffde7; }
+    .grid-img-container { width: 100%; height: 110px; margin-bottom: 10px; display: flex; justify-content: center; }
+    .grid-img-container img { height: 100%; object-fit: contain; cursor: zoom-in; }
+    .rank-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; gap: 4px; }
+    .price-label { font-weight: bold; font-size: 0.7rem; color: #333; flex: 1; white-space: nowrap; }
+    .qty-ctrl { display: flex; align-items: center; background: #eee; border-radius: 6px; padding: 1px; border: 1px solid #ccc; width: fit-content; }
+    .qty-ctrl.has-value { background: var(--primary); color: white; border-color: var(--primary); }
+    .qty-btn { border: none; background: transparent; color: inherit; width: 26px; height: 26px; font-weight: bold; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+    .qty-num { width: 34px; border: none; background: #fff; text-align: center; font-weight: 900; border-radius: 4px; height: 24px; font-size: 0.95rem; padding: 0; margin: 0 1px; }
+    .footer-bar { position: fixed; bottom: 0; width: 100%; background: var(--primary); color: #fff; padding: 15px 20px; z-index: 2000; border-radius: 20px 20px 0 0; }
+    .total-price { font-size: 2rem; font-weight: 900; color: var(--accent); }
+    #receipt { display: none; background: white; padding: 30px; }
+    #imageModal { display:none; position:fixed; z-index:5000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; }
+    @media print { .no-print { display: none !important; } #receipt { display: block !important; } }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid no-print" id="main-ui">
+  <div class="sticky-top p-3 mb-2 shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div class="fw-bold fs-5"><i class="bi bi-cpu-fill"></i> AR買取 Pro (Cloud)</div>
+      <div class="view-switch">
+        <button id="v-table" class="view-btn active" onclick="switchView('table')"><i class="bi bi-table"></i></button>
+        <button id="v-grid" class="view-btn" onclick="switchView('grid')"><i class="bi bi-grid-fill"></i></button>
+      </div>
+    </div>
+    <div class="p-2 bg-light rounded mb-2 d-flex align-items-center gap-2 shadow-sm overflow-auto">
+      <button class="btn btn-primary btn-sm fw-bold text-nowrap" onclick="createNewCase()">新規+</button>
+      <div id="case-list-area" class="d-flex"></div>
+    </div>
+    <div class="row g-1 mb-2">
+      <div class="col-6"><input type="text" id="cust-name" class="form-control form-control-sm" placeholder="お客様名" oninput="autoUpdateCaseName()"></div>
+      <div class="col-6"><input type="tel" id="cust-tel" class="form-control form-control-sm" placeholder="連絡先" oninput="saveCurrentCase()"></div>
+    </div>
+    <div class="d-flex gap-1">
+      <input type="text" id="search" class="form-control form-control-sm" placeholder="カード検索..." oninput="draw()">
+      <button class="btn btn-dark btn-sm px-3 fw-bold text-nowrap" onclick="showReceipt()">明細確認</button>
+      <button class="btn btn-outline-dark btn-sm" onclick="toggleHistory()"><i class="bi bi-clock-history"></i></button>
+    </div>
+    <div id="filter-btns" class="d-flex flex-wrap gap-1 mt-2 justify-content-center"></div>
+  </div>
+  <div id="display-container"><div class="text-center p-5 text-muted">データを読み込み中...</div></div>
+</div>
+
+<div id="historyPanel" style="position: fixed; top: 0; right: -350px; width: 350px; height: 100%; background: white; z-index: 3000; box-shadow: -5px 0 20px rgba(0,0,0,0.1); transition: 0.3s; padding: 20px; overflow-y: auto;">
+  <div class="d-flex justify-content-between align-items-center mb-4"><h5 class="fw-bold m-0">最近の履歴</h5><button class="btn-close" onclick="toggleHistory()"></button></div>
+  <div id="history-list"></div>
+</div>
+
+<div id="receipt" class="container">
+  <div class="text-center mb-4"><h3 class="fw-bold">買取査定明細書</h3><div id="receipt-date" class="text-muted small"></div></div>
+  <div id="receipt-meta" class="mb-4 p-2 bg-light rounded-2 fw-bold"></div>
+  <table class="table align-middle border table-sm">
+    <thead class="table-dark"><tr><th>カード名</th><th class="text-center">状態</th><th class="text-end">単価</th><th class="text-center">枚数</th><th class="text-end">小計</th></tr></thead>
+    <tbody id="r-body"></tbody>
+    <tfoot class="fs-5 fw-bold"><tr><td colspan="4" class="text-end">合計査定金額</td><td id="r-total-amt" class="text-end text-danger"></td></tr></tfoot>
+  </table>
+  <div class="no-print mt-4 d-flex flex-column gap-2">
+    <button class="btn btn-success btn-lg py-3 fw-bold" onclick="window.print()">印刷 / PDF保存</button>
+    <button class="btn btn-primary btn-lg py-3 fw-bold" id="confirm-btn" onclick="finalizeTrade()">買取を確定する</button>
+    <button class="btn btn-outline-secondary" onclick="hideReceipt()">編集に戻る</button>
+  </div>
+</div>
+
+<div class="footer-bar no-print d-flex justify-content-between align-items-center shadow-lg">
+  <div><span class="total-price">¥<span id="t-amt">0</span></span><span class="ms-2 badge bg-white text-dark rounded-pill"><span id="t-qty">0</span>枚</span></div>
+  <button class="btn btn-outline-warning rounded-pill fw-bold" onclick="resetAll()">リセット</button>
+</div>
+
+<div id="imageModal" onclick="this.style.display='none'"><img id="modalImg" style="max-width:90%; max-height:90%;"></div>
+
+<script>
+  // ★GASのURLをセット済み
+  const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwi7tWn74PWL-HD59oj7p1DZDdfddMn4wdJRJCCZJKznuBSLZ6GA88W6Lp-g1RrFkkSOw/exec";
+
+  let cards = [], inputs = {}, activeCaseId = "default", cases = {}, currentFilter = "", currentView = "table";
+  let historyLogs = JSON.parse(localStorage.getItem('ar_history_logs_final') || "[]");
+  const filterMap = { "あ": "^[あいうえおアイウエオ]", "か": "^[かきくけこがぎぐげごカキクケコガぎぐげご]", "さ": "^[さしすせそざじずぜぞサシスセソザジズゼゾ]", "た": "^[たちつてとだぢづでどタチツテトダヂヂヅデド]", "な": "^[なにぬねのナニヌネノ]", "は": "^[はひふへほばびぶべぼぱぴぷぺぽハヒフヘホバビブベボパピプペポ]", "ま": "^[まみむめもマミムメモ]", "や": "^[やゆよヤユヨ]", "ら": "^[らりるれろラリルレロ]", "わ": "^[わをんワヲン]" };
+
+  window.onload = () => {
+    const btnArea = document.getElementById('filter-btns');
+    ["ALL", ...Object.keys(filterMap)].forEach(l => {
+      const b = document.createElement('button');
+      b.className = `filter-btn btn btn-outline-secondary btn-sm m-1 ${l === "ALL" ? "active" : ""}`; b.innerText = l;
+      b.onclick = function() { 
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active')); 
+        this.classList.add('active'); currentFilter = (l === "ALL") ? "" : filterMap[l]; draw(); 
+      };
+      btnArea.appendChild(b);
+    });
+    
+    initData();
+    fetch(GAS_API_URL)
+      .then(res => res.json())
+      .then(d => { cards = d; draw(); })
+      .catch(e => { document.getElementById('display-container').innerHTML = "データの読み込みに失敗しました。"; });
+  };
+
+  function initData() {
+    const saved = localStorage.getItem('ar_pro_storage');
+    if (saved) {
+      cases = JSON.parse(saved);
+      activeCaseId = localStorage.getItem('ar_pro_active_id') || Object.keys(cases)[0];
+    } else {
+      cases = { "default": { name: "新規", tel: "", data: {} } };
+      activeCaseId = "default";
+    }
+    loadCase(activeCaseId);
+  }
+
+  function loadCase(id) {
+    if(!cases[id]) id = Object.keys(cases)[0];
+    activeCaseId = id;
+    inputs = cases[id].data || {};
+    document.getElementById('cust-name').value = (cases[id].name === "新規") ? "" : cases[id].name;
+    document.getElementById('cust-tel').value = cases[id].tel || "";
+    localStorage.setItem('ar_pro_active_id', id);
+    calc(); draw(); updateCaseListUI();
+  }
+
+  function saveCurrentCase() {
+    if(!cases[activeCaseId]) return;
+    cases[activeCaseId].name = document.getElementById('cust-name').value || "新規";
+    cases[activeCaseId].tel = document.getElementById('cust-tel').value;
+    cases[activeCaseId].data = inputs;
+    localStorage.setItem('ar_pro_storage', JSON.stringify(cases));
+  }
+
+  function changeQty(name, type, price, delta) {
+    const key = name + '-' + type;
+    let q = (inputs[key]?.q || 0) + delta;
+    if (q <= 0) delete inputs[key]; else inputs[key] = { n: name, t: type, p: price, q: q };
+    saveCurrentCase(); calc();
+    // 部分更新
+    document.querySelectorAll(`[data-ctrl-key="${key}"]`).forEach(el => {
+      el.classList.toggle('has-value', q > 0);
+      el.querySelector('input').value = q > 0 ? q : 0;
+    });
+    const isAny = ['S','A','B','C','D'].some(t => inputs[name+'-'+t]?.q > 0);
+    document.querySelectorAll(`[data-row-name="${name}"]`).forEach(el => el.classList.toggle('has-value', isAny));
+  }
+
+  function manualQty(name, type, price, val) {
+    const key = name + '-' + type; let q = parseInt(val) || 0;
+    if (q <= 0) delete inputs[key]; else inputs[key] = { n: name, t: type, p: price, q: q };
+    saveCurrentCase(); calc();
+  }
+
+  function calc() {
+    let tq = 0, ta = 0; Object.values(inputs).forEach(i => { tq += i.q; ta += (i.q * i.p); });
+    document.getElementById('t-qty').innerText = tq; 
+    document.getElementById('t-amt').innerText = ta.toLocaleString();
+  }
+
+  function draw() {
+    const container = document.getElementById('display-container');
+    if (cards.length === 0) return;
+    const sw = document.getElementById('search').value.toLowerCase();
+    const filtered = cards.filter(c => c.isFixed || (c.name.toLowerCase().includes(sw) && (currentFilter === "" || new RegExp(currentFilter).test(c.name))));
+    
+    if (currentView === 'table') {
+      let html = `<div class="main-table-container"><table class="main-table"><thead><tr><th style="width:30%">カード名</th><th>S</th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody>`;
+      html += filtered.map(c => {
+        const has = ['S','A','B','C','D'].some(t => inputs[c.name+'-'+t]?.q > 0);
+        const cells = ['S','A','B','C','D'].map(t => {
+          const q = inputs[c.name+'-'+t]?.q || 0;
+          return `<td><div class="rank-row"><span class="price-label">¥${c['price'+t].toLocaleString()}</span><div class="qty-ctrl ${q>0?'has-value':''}" data-ctrl-key="${c.name}-${t}"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},-1)">-</button><input type="number" class="qty-num" value="${q}" oninput="manualQty('${c.name}','${t}',${c['price'+t]},this.value)"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},1)">+</button></div></div></td>`;
+        }).join('');
+        return `<tr data-row-name="${c.name}" class="${has?'has-value':''}"><td><div class="d-flex align-items-center gap-2"><img src="${c.image}" style="width:40px;height:55px;object-fit:contain" onclick="zoom('${c.image}')"><div class="fw-bold small">${c.name}</div></div></td>${cells}</tr>`;
+      }).join('');
+      container.innerHTML = html + `</tbody></table></div>`;
+    } else {
+      container.innerHTML = `<div class="card-grid">` + filtered.map(c => {
+        const has = ['S','A','B','C','D'].some(t => inputs[c.name+'-'+t]?.q > 0);
+        const ctrls = ['S','A','B','C','D'].map(t => {
+          const q = inputs[c.name+'-'+t]?.q || 0;
+          return `<div class="rank-row"><span class="price-label">${t}: ¥${c['price'+t].toLocaleString()}</span><div class="qty-ctrl ${q>0?'has-value':''}" data-ctrl-key="${c.name}-${t}"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},-1)">-</button><input type="number" class="qty-num" value="${q}" oninput="manualQty('${c.name}','${t}',${c['price'+t]},this.value)"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${c['price'+t]},1)">+</button></div></div>`;
+        }).join('');
+        return `<div class="grid-item ${has?'has-value':''}" data-row-name="${c.name}">
+          <div class="grid-img-container"><img src="${c.image}" onclick="zoom('${c.image}')"></div>
+          <div class="fw-bold small mb-2 text-center" style="height:2.4em; overflow:hidden;">${c.name}</div>${ctrls}</div>`;
+      }).join('') + `</div>`;
+    }
+  }
+
+  function finalizeTrade() {
+    if(!Object.values(inputs).some(i=>i.q>0)) { alert("入力がありません"); return; }
+    if(!confirm("スプレッドシートに保存して査定を確定しますか？")) return;
+
+    const btn = document.getElementById('confirm-btn');
+    btn.disabled = true; btn.innerHTML = '送信中...';
+
+    const tradeData = {
+      customerName: document.getElementById('cust-name').value || "未入力",
+      tel: document.getElementById('cust-tel').value || "",
+      totalQty: document.getElementById('t-qty').innerText,
+      totalAmount: document.getElementById('t-amt').innerText.replace(/,/g, ''),
+      items: Object.values(inputs).filter(i => i.q > 0)
+    };
+
+    fetch(GAS_API_URL, {
+      method: "POST",
+      body: JSON.stringify(tradeData)
+    })
+    .then(res => res.json())
+    .then(res => {
+      if(res.result === "SUCCESS") {
+        historyLogs.unshift({ ...tradeData, date: new Date().toLocaleString() });
+        localStorage.setItem('ar_history_logs_final', JSON.stringify(historyLogs.slice(0, 20)));
+        alert("保存完了しました。");
+        delete cases[activeCaseId];
+        initData();
+        hideReceipt();
+      } else { alert("エラー: " + res.result); }
+    })
+    .catch(e => alert("通信エラーが発生しました"))
+    .finally(() => { btn.disabled = false; btn.innerHTML = '買取を確定する'; });
+  }
+
+  function switchView(v) { currentView = v; document.getElementById('v-table').classList.toggle('active', v==='table'); document.getElementById('v-grid').classList.toggle('active', v==='grid'); draw(); }
+  function showReceipt() { document.getElementById('main-ui').style.display='none'; document.getElementById('receipt').style.display='block'; refreshReceiptTable(); }
+  function hideReceipt() { document.getElementById('receipt').style.display='none'; document.getElementById('main-ui').style.display='block'; }
+  function refreshReceiptTable() {
+    const b = document.getElementById('r-body'); b.innerHTML = "";
+    Object.values(inputs).filter(i=>i.q>0).forEach(i => {
+      b.innerHTML += `<tr><td>${i.n}</td><td class="text-center">${i.t}</td><td class="text-end">¥${i.p.toLocaleString()}</td><td class="text-center">${i.q}</td><td class="text-end">¥${(i.q*i.p).toLocaleString()}</td></tr>`;
+    });
+    document.getElementById('r-total-amt').innerText = "¥" + document.getElementById('t-amt').innerText;
+    document.getElementById('receipt-meta').innerText = `顧客名: ${document.getElementById('cust-name').value} 様 / TEL: ${document.getElementById('cust-tel').value}`;
+    document.getElementById('receipt-date').innerText = new Date().toLocaleString();
+  }
+  function updateCaseListUI() {
+    const area = document.getElementById('case-list-area'); area.innerHTML = "";
+    Object.keys(cases).forEach(id => {
+      const b = document.createElement('button');
+      b.className = `case-badge ${id === activeCaseId ? 'active' : 'bg-white border'}`;
+      b.innerHTML = `${cases[id].name} <span style="font-size:10px; opacity:0.6" onclick="deleteCase(event,'${id}')">✕</span>`;
+      b.onclick = () => loadCase(id);
+      area.appendChild(b);
+    });
+  }
+  function createNewCase() { const id = "c_"+Date.now(); cases[id] = {name:"新規",tel:"",data:{}}; loadCase(id); }
+  function deleteCase(e, id) { e.stopPropagation(); if(Object.keys(cases).length<=1) return; delete cases[id]; if(activeCaseId===id) activeCaseId=Object.keys(cases)[0]; saveCurrentCase(); updateCaseListUI(); loadCase(activeCaseId); }
+  function autoUpdateCaseName() { saveCurrentCase(); updateCaseListUI(); }
+  function resetAll() { if(confirm('入力をすべて消去しますか？')) { inputs={}; saveCurrentCase(); draw(); calc(); } }
+  function zoom(url) { document.getElementById('modalImg').src = url; document.getElementById('imageModal').style.display = 'flex'; }
+  function toggleHistory() {
+    const p = document.getElementById('historyPanel'); p.style.right = (p.style.right === '0px') ? '-350px' : '0px';
+    const list = document.getElementById('history-list');
+    list.innerHTML = historyLogs.map(h => `<div class="card mb-2 p-2 small border-0 bg-light"><div class="text-muted" style="font-size:10px">${h.date}</div><div class="fw-bold">${h.customerName}</div><div>${h.totalQty}点 / ¥${parseInt(h.totalAmount).toLocaleString()}</div></div>`).join('') || "履歴なし";
+  }
+</script>
+</body>
+</html>
