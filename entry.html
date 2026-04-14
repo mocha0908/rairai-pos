@@ -18,12 +18,9 @@
     .status-msg { font-size: 0.8rem; font-weight: bold; padding: 12px; border-radius: 4px; margin-bottom: 15px; display: none; border: 1px solid transparent; }
     .msg-success { background: #d1e7dd; border-color: #badbcc; color: #0f5132; }
     .msg-error { background: #f8d7da; border-color: #f5c2c7; color: #842029; }
-    .terms-box { 
-      background: #fff; border: 1px solid #dee2e6; padding: 15px; font-size: 0.7rem; 
-      height: 200px; overflow-y: scroll; margin-bottom: 15px; line-height: 1.6; 
-      color: #444; white-space: pre-wrap; border-radius: 4px;
-    }
+    .terms-box { background: #fff; border: 1px solid #dee2e6; padding: 15px; font-size: 0.7rem; height: 180px; overflow-y: scroll; margin-bottom: 15px; line-height: 1.6; color: #444; white-space: pre-wrap; border-radius: 4px; }
     .cancel-check-area { background: #fff3cd; border: 1px solid #ffeeba; padding: 12px; border-radius: 4px; margin-top: 15px; }
+    .form-control, .form-select { border-radius: 2px; font-size: 0.9rem; }
   </style>
 </head>
 <body>
@@ -52,10 +49,30 @@
           <div class="col-4"><label class="form-label">郵便番号</label><input type="text" id="zip" class="form-control p-postal-code" placeholder="1234567" inputmode="numeric" maxlength="7"></div>
           <div class="col-8"><label class="form-label">現住所</label><input type="text" id="addressText" class="form-control need-req p-region p-locality p-street-address p-extended-address" required></div>
         </div>
+        
         <div class="row g-2 mt-2">
-          <div class="col-6"><label class="form-label">身分証番号</label><input type="text" id="idNum" class="form-control need-req" required></div>
-          <div class="col-6"><label class="form-label">職業</label><input type="text" id="job" class="form-control need-req" required></div>
+          <div class="col-5">
+            <label class="form-label">身分証種類</label>
+            <select id="idType" class="form-select need-req" required>
+              <option value="">選択</option>
+              <option value="運転免許証">運転免許証</option>
+              <option value="健康保険証">健康保険証</option>
+              <option value="マイナンバーカード">マイナンバーカード</option>
+              <option value="パスポート">パスポート</option>
+              <option value="学生証">学生証</option>
+              <option value="その他">その他</option>
+            </select>
+          </div>
+          <div class="col-7">
+            <label class="form-label">身分証番号</label>
+            <input type="text" id="idNum" class="form-control need-req" placeholder="番号を入力" required>
+          </div>
         </div>
+
+        <div class="row g-2 mt-2">
+          <div class="col-12"><label class="form-label">職業</label><input type="text" id="job" class="form-control need-req" placeholder="会社員、自営業など" required></div>
+        </div>
+
         <div class="mt-3 small fw-bold text-secondary border-bottom pb-1">振込先口座</div>
         <div class="row g-2 mt-1">
           <div class="col-6"><input type="text" id="bankName" class="form-control form-control-sm need-req" placeholder="銀行名" required></div>
@@ -70,14 +87,14 @@
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="cancelIfSubMax">
           <label class="form-check-label small fw-bold text-dark" for="cancelIfSubMax">満額（状態S）査定以外の場合はキャンセルする</label>
-          <div style="font-size: 0.65rem; color: #666; margin-top: 2px;">※チェックを入れた場合、減額時は自動的に返送（着払い）となります。</div>
+          <div style="font-size: 0.65rem; color: #666; margin-top: 2px;">※チェック時は、減額なら自動的に着払い返送となります。</div>
         </div>
       </div>
 
       <div class="section-title mt-4">郵送買取利用規約</div>
       <div class="terms-box">■ 郵送買取利用規約・同意事項
 【1】査定および承諾について
-当店の査定結果は基準に基づき決定いたします。LINE通知後3日以内に返信がない場合は承諾とみなし、買取を成立させます。
+当店の査定結果は基準に基づき決定いたします。LINE通知後3日以内に返信がない場合は承諾とみなし、買取を成立させます。一度成立した取引はキャンセルできません。
 【2】キャンセルおよび返送について
 査定結果にご納得いただけない場合、返送料お客様負担（着払い）にて返送可能です。「満額以外キャンセル」を選択された場合、減額時は即時返送手続きに入ります。
 【3】査定基準について
@@ -98,8 +115,9 @@
 </div>
 
 <script>
-  const GAS_URL = "YOUR_GAS_URL_HERE";
+  const GAS_URL = "YOUR_GAS_URL";
 
+  // 生年月日スラッシュ補完
   document.getElementById('birthday').addEventListener('input', function(e) {
     let v = this.value.replace(/\D/g, '');
     if (v.length >= 5) v = v.slice(0, 4) + '/' + v.slice(4, 6) + '/' + v.slice(6, 8);
@@ -117,10 +135,10 @@
       const json = await res.json();
       msg.style.display = "block";
       if(json.found) {
-        msg.className = "status-msg msg-success"; msg.innerText = "過去の登録情報を確認。変更がない項目は入力不要です。";
+        msg.className = "status-msg msg-success"; msg.innerText = "照合成功。変更がない項目は入力不要です。";
         document.querySelectorAll('.need-req').forEach(el => { el.required = false; el.placeholder = "登録済みの情報を利用"; });
       } else {
-        msg.className = "status-msg msg-error"; msg.innerText = "登録情報がありません。全項目入力してください。";
+        msg.className = "status-msg msg-error"; msg.innerText = "登録なし。全項目入力してください。";
         document.querySelectorAll('.need-req').forEach(el => { el.required = true; el.placeholder = ""; });
       }
     } catch(e) { alert("照合エラー"); }
@@ -131,20 +149,22 @@
     const btn = document.getElementById('submitBtn');
     btn.disabled = true; btn.innerText = "送信中...";
     const getVal = (id) => document.getElementById(id).value.trim();
+    
     const data = {
       action: "customer_register",
       customerDetail: {
         name: getVal('name'), kana: getVal('kana'), birthday: getVal('birthday'), tel: getVal('tel'),
-        addressText: getVal('addressText'), idNum: getVal('idNum'), job: getVal('job'),
+        addressText: getVal('addressText'), idType: document.getElementById('idType').value, idNum: getVal('idNum'), job: getVal('job'),
         bankName: getVal('bankName'), bankBranch: getVal('bankBranch'), bankType: document.getElementById('bankType').value,
         bankNum: getVal('bankNum'), bankHolder: getVal('bankHolder'),
         cancelIfSubMax: document.getElementById('cancelIfSubMax').checked ? "希望する" : "希望しない"
       }
     };
+
     try {
-      const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
+      await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
       alert("申し込みが完了しました。"); location.reload();
-    } catch(err) { alert("送信に失敗しました。"); btn.disabled = false; btn.innerText = "査定を申し込む"; }
+    } catch(err) { alert("送信に失敗しました。"); btn.disabled = false; }
   };
 </script>
 </body>
