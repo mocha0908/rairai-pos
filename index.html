@@ -12,10 +12,10 @@
     
     /* --- メインUI --- */
     .sticky-top { background: #fff; border-bottom: 2px solid var(--main); padding: 10px 15px !important; z-index: 1020; }
-    
-    /* 待機リスト用のバッジ（これだけは残します） */
-    .case-badge { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #cbd5e1; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; background: white; cursor: pointer; white-space: nowrap; }
-    .waiting-badge { background: var(--accent); color: #854d0e; border-color: #eab308; }
+    .case-badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; background: white; cursor: pointer; min-width: 80px; margin-right: 5px; }
+    .case-badge.active { background: var(--main); color: white; border-color: var(--main); }
+    .case-badge .del-btn { color: #94a3b8; font-size: 1.1rem; padding-left: 5px; cursor: pointer; }
+    .case-badge.active .del-btn { color: #fff; opacity: 0.7; }
 
     .search-area { background: #fff; padding: 10px 15px; border-bottom: 1px solid #e2e8f0; }
     .filter-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 8px; }
@@ -28,21 +28,20 @@
     .main-table td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
     .has-value-row { background-color: #fffbeb !important; }
 
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 15px; padding: 15px; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 15px; padding: 15px; }
     .grid-item { background: white; border-radius: 12px; padding: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; min-height: 400px; }
     .grid-item.has-value { border: 2px solid var(--main); background: #fffbeb; }
     .grid-img { width: 100%; height: 130px; object-fit: contain; margin-bottom: 10px; background: #f8fafc; }
     .grid-card-name { font-size: 0.75rem; font-weight: bold; height: 3em; overflow: hidden; margin-bottom: 10px; }
-    
     .grid-ctrl-table { width: 100%; font-size: 0.75rem; }
-    .grid-ctrl-table td { padding: 4px 0; vertical-align: middle; }
-    .price-tag { color: var(--danger); font-weight: bold; font-size: 0.8rem; }
+    .grid-ctrl-table td { padding: 3px 0; vertical-align: middle; }
+    .price-tag { color: var(--danger); font-weight: bold; }
 
     /* 数量ボタン・手打ち入力 */
     .qty-ctrl { display: inline-flex; align-items: center; border-radius: 4px; border: 1px solid #cbd5e1; overflow: hidden; background: #fff; }
     .qty-ctrl.has-value { background: var(--main); color: white; border-color: var(--main); }
-    .qty-btn { border: none; background: transparent; color: inherit; width: 26px; height: 28px; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
-    .qty-num { width: 36px; border: none; text-align: center; background: transparent; font-weight: bold; font-size: 0.95rem; color: inherit; outline: none; padding: 0; }
+    .qty-btn { border: none; background: transparent; color: inherit; width: 30px; height: 30px; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+    .qty-num { width: 44px; border: none; text-align: center; background: transparent; font-weight: bold; font-size: 1rem; color: inherit; outline: none; }
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
 
@@ -54,28 +53,25 @@
     .table-receipt th, .table-receipt td { border: 1px solid #dee2e6; padding: 12px 15px; vertical-align: middle; }
     .table-receipt th { background-color: #f8fafc; text-align: center; color: #64748b; font-size: 0.85rem; }
     .btn-delete-row { color: #ef4444; border: none; background: none; font-size: 1.2rem; cursor: pointer; }
+    
     .print-only { display: none !important; }
 
     @media print {
-      @page { size: A4; margin: 10mm; }
-      body { background: #fff !important; color: #333 !important; font-size: 10pt; }
+      @page { size: A4; margin: 15mm; }
+      body { background: #fff !important; color: #333 !important; font-size: 11pt; }
       .no-print, #main-ui, .footer-bar { display: none !important; }
-      .print-only { display: table-cell !important; }
       
-      #receipt { display: block !important; padding: 0 !important; margin: 0 !important; width: 100% !important; min-height: 0 !important; height: auto !important; }
-      .receipt-container { padding: 0 !important; width: 100% !important; max-width: 100% !important; }
+      #receipt { display: block !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+      .receipt-container { padding: 0 !important; width: 100% !important; }
 
-      .receipt-title { margin-bottom: 10px !important; padding-bottom: 5px !important; font-size: 16pt !important; border-bottom: 2px solid #333; display: inline-block; letter-spacing: 2px; }
-      #receipt-meta { margin: 0 0 10px 0 !important; padding: 8px !important; font-size: 10pt !important; -webkit-print-color-adjust: exact; }
-
-      .table-receipt { border: 2px solid #000 !important; margin-top: 0 !important; }
-      .table-receipt tr { page-break-inside: avoid; }
-      .table-receipt th, .table-receipt td { border: 1px solid #000 !important; padding: 4px 8px !important; color: #000 !important; font-size: 10pt !important; line-height: 1.3 !important; }
+      .table-receipt { border: 2px solid #333 !important; page-break-inside: auto; }
+      .table-receipt tr { page-break-inside: avoid; page-break-after: auto; }
+      .table-receipt th, .table-receipt td { border: 1px solid #ccc !important; padding: 8px 12px !important; color: #333 !important; }
       .table-receipt th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
       
-      .print-compress-text { font-size: 10pt !important; }
-      .print-compress-total { font-size: 12pt !important; }
       .text-danger { color: #d9534f !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
+      .receipt-title { border-bottom: 2px solid #333; padding-bottom: 5px; display: inline-block; margin-bottom: 15px; letter-spacing: 2px; }
+      .print-only { display: table-cell !important; }
     }
   </style>
 </head>
@@ -92,12 +88,15 @@
     </div>
     
     <div class="d-flex align-items-center gap-2 overflow-auto pb-1">
-      <select id="case-select" class="form-select form-select-sm fw-bold border-dark" style="max-width: 250px;" onchange="switchCase(this.value)">
-        </select>
-      <button class="btn btn-primary btn-sm fw-bold px-2" onclick="createNewCase()"><i class="bi bi-plus-lg"></i> 新規</button>
-      <button class="btn btn-outline-danger btn-sm fw-bold px-2" onclick="deleteCurrentCase()"><i class="bi bi-trash"></i> 削除</button>
+      <button class="btn btn-primary btn-sm fw-bold px-3" onclick="createNewCase()">新規</button>
       
-      <div id="waiting-area" class="d-flex gap-1 border-start ps-2"></div>
+      <div id="case-list-area" class="d-flex gap-1"></div>
+      
+      <div class="border-start ps-2 ms-1 d-flex align-items-center">
+        <select id="waiting-select" class="form-select form-select-sm fw-bold border-warning" style="min-width: 180px; background-color: #fffbeb; color: #854d0e;" onchange="handleWaitingSelect(this)">
+          <option value="">⏳ 待機中リスト...</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -162,7 +161,7 @@
       fb.appendChild(b);
     });
     
-    const saved = localStorage.getItem('rairai_pos_v27');
+    const saved = localStorage.getItem('rairai_pos_v28');
     if (saved) { 
       cases = JSON.parse(saved); 
       activeCaseId = localStorage.getItem('rairai_pos_active_id') || Object.keys(cases)[0]; 
@@ -285,12 +284,12 @@
     cases[activeCaseId].data = inputs;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      localStorage.setItem('rairai_pos_v27', JSON.stringify(cases));
+      localStorage.setItem('rairai_pos_v28', JSON.stringify(cases));
       localStorage.setItem('rairai_pos_active_id', activeCaseId);
     }, 500);
   }
 
-  // 🌟 ドロップダウンによる切り替え
+  // 🌟 タブを切り替える処理
   function switchCase(id) {
     saveCurrentCase();
     loadCase(id);
@@ -314,36 +313,65 @@
     updateCaseListUI(); 
   }
   
-  // 🌟 リストのUIをドロップダウン（select）に更新
+  // 🌟 作業中案件のタブ（バッジ）を生成（クリックで確実に切り替わる）
   function updateCaseListUI() { 
-    const select = document.getElementById('case-select');
-    select.innerHTML = ""; 
+    const area = document.getElementById('case-list-area'); 
+    area.innerHTML = ""; 
     Object.keys(cases).forEach(id => { 
-      const opt = document.createElement('option');
-      opt.value = id;
-      opt.text = cases[id].name;
-      if (id === activeCaseId) opt.selected = true;
-      select.appendChild(opt);
+      const b = document.createElement('div'); 
+      b.className = `case-badge ${id === activeCaseId ? 'active' : ''}`; 
+      b.setAttribute('data-id', id); 
+      b.onclick = () => switchCase(id); // クリックで確実に切り替え
+      b.innerHTML = `<span>${cases[id].name}</span><i class="bi bi-x-circle-fill del-btn" onclick="deleteCase(event, '${id}')"></i>`; 
+      area.appendChild(b); 
     }); 
   }
   
-  // 🌟 削除機能を「現在の案件を削除」に変更
-  function deleteCurrentCase() { 
-    if(!confirm("表示中の案件を削除しますか？")) return;
+  function deleteCase(e, id) { 
+    e.stopPropagation(); 
+    if(!confirm("この案件を削除しますか？")) return;
     if (Object.keys(cases).length <= 1) { 
       inputs = {}; document.getElementById('cust-name').value = ""; 
       saveCurrentCase(); loadCase(activeCaseId); return; 
     } 
-    delete cases[activeCaseId]; 
-    activeCaseId = Object.keys(cases)[0]; 
+    delete cases[id]; 
+    if (activeCaseId === id) activeCaseId = Object.keys(cases)[0]; 
     saveCurrentCase(); 
     loadCase(activeCaseId); 
   }
   
   async function finalizeTrade() { if(!confirm("確定して保存しますか？")) return; const btn = document.getElementById('btn-finalize'); btn.disabled = true; const tradeData = { action: "log_trade", customerName: document.getElementById('cust-name').value, tel: cases[activeCaseId].tel || "", totalQty: document.getElementById('t-qty').innerText, totalAmount: document.getElementById('t-amt').innerText.replace(/,/g, ''), items: Object.values(inputs).filter(i => i.q > 0) }; try { const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(tradeData) }); const json = await res.json(); if(json.result === "SUCCESS") { alert("保存完了"); delete cases[activeCaseId]; if(Object.keys(cases).length===0) createNewCase(); else { activeCaseId=Object.keys(cases)[0]; loadCase(activeCaseId); } hideReceipt(); } } catch(e) {} finally { btn.disabled = false; } }
   
-  async function refreshWaiting() { try { const res = await fetch(GAS_URL + "?action=getWaiting"); const list = await res.json(); document.getElementById('waiting-area').innerHTML = list.map((c, i) => `<button class="case-badge waiting-badge" onclick="importWaiting(${i})"><i class="bi bi-person-fill"></i> ${c.name.substr(0,4)}</button>`).join(''); } catch(e){} }
-  async function importWaiting(idx) { const c = waitingList[idx]; if(!confirm(c.name + "様を読み込む？")) return; const id = "c_" + Date.now(); cases[id] = { name: c.name, tel: c.tel, cancelIfSubMax: c.cancelStatus, data: {} }; saveCurrentCase(); loadCase(id); }
+  // 🌟 待機リストをプルダウンに反映
+  async function refreshWaiting() { 
+    try { 
+      const res = await fetch(GAS_URL + "?action=getWaiting"); 
+      waitingList = await res.json(); 
+      const select = document.getElementById('waiting-select');
+      let options = `<option value="">⏳ 待機中 (${waitingList.length}名)...</option>`;
+      waitingList.forEach((c, i) => {
+        options += `<option value="${i}">${c.name} 様</option>`;
+      });
+      select.innerHTML = options;
+    } catch(e){} 
+  }
+
+  // 🌟 プルダウンから選んだら読み込む処理
+  function handleWaitingSelect(selectObj) {
+    const idx = selectObj.value;
+    if (idx === "") return;
+    const c = waitingList[idx]; 
+    if(!confirm(c.name + " 様の案件を読み込みますか？")) {
+      selectObj.value = ""; // キャンセルしたら元に戻す
+      return; 
+    }
+    const id = "c_" + Date.now(); 
+    cases[id] = { name: c.name, tel: c.tel, cancelIfSubMax: c.cancelStatus, data: {} }; 
+    saveCurrentCase(); 
+    loadCase(id); 
+    selectObj.value = ""; // 読み込み完了後、選択状態をリセット
+  }
+
   function resetAll() { if(confirm('全て消去しますか？')) { localStorage.clear(); location.reload(); } }
 </script>
 </body>
