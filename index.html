@@ -12,10 +12,10 @@
     
     /* --- メインUI --- */
     .sticky-top { background: #fff; border-bottom: 2px solid var(--main); padding: 10px 15px !important; z-index: 1020; }
-    .case-badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; background: white; cursor: pointer; min-width: 80px; margin-right: 5px; }
-    .case-badge.active { background: var(--main); color: white; border-color: var(--main); }
-    .case-badge .del-btn { color: #94a3b8; font-size: 1rem; padding-left: 5px; cursor: pointer; }
-    .case-badge.active .del-btn { color: #fff; opacity: 0.7; }
+    
+    /* 待機リスト用のバッジ（これだけは残します） */
+    .case-badge { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #cbd5e1; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; background: white; cursor: pointer; white-space: nowrap; }
+    .waiting-badge { background: var(--accent); color: #854d0e; border-color: #eab308; }
 
     .search-area { background: #fff; padding: 10px 15px; border-bottom: 1px solid #e2e8f0; }
     .filter-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 8px; }
@@ -28,7 +28,6 @@
     .main-table td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
     .has-value-row { background-color: #fffbeb !important; }
 
-    /* 🌟 タイルのはみ出し対策：minmaxを175pxから210pxに広げて余裕を持たせる */
     .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 15px; padding: 15px; }
     .grid-item { background: white; border-radius: 12px; padding: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; min-height: 400px; }
     .grid-item.has-value { border: 2px solid var(--main); background: #fffbeb; }
@@ -37,9 +36,9 @@
     
     .grid-ctrl-table { width: 100%; font-size: 0.75rem; }
     .grid-ctrl-table td { padding: 4px 0; vertical-align: middle; }
-    .price-tag { color: var(--danger); font-weight: bold; font-size: 0.8rem; } /* 価格の文字を少しだけシャープに */
+    .price-tag { color: var(--danger); font-weight: bold; font-size: 0.8rem; }
 
-    /* 🌟 数量ボタン・手打ち入力：ボタンをミリ単位でスリム化して絶対にはみ出させない */
+    /* 数量ボタン・手打ち入力 */
     .qty-ctrl { display: inline-flex; align-items: center; border-radius: 4px; border: 1px solid #cbd5e1; overflow: hidden; background: #fff; }
     .qty-ctrl.has-value { background: var(--main); color: white; border-color: var(--main); }
     .qty-btn { border: none; background: transparent; color: inherit; width: 26px; height: 28px; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
@@ -91,10 +90,14 @@
         <button id="btn-grid" class="btn btn-sm btn-outline-dark" onclick="switchView('grid')">タイル</button>
       </div>
     </div>
+    
     <div class="d-flex align-items-center gap-2 overflow-auto pb-1">
-      <button class="btn btn-primary btn-sm fw-bold px-3" onclick="createNewCase()">新規</button>
-      <div id="waiting-area" class="d-flex gap-1"></div>
-      <div id="case-list-area" class="d-flex gap-1 border-start ps-2"></div>
+      <select id="case-select" class="form-select form-select-sm fw-bold border-dark" style="max-width: 250px;" onchange="switchCase(this.value)">
+        </select>
+      <button class="btn btn-primary btn-sm fw-bold px-2" onclick="createNewCase()"><i class="bi bi-plus-lg"></i> 新規</button>
+      <button class="btn btn-outline-danger btn-sm fw-bold px-2" onclick="deleteCurrentCase()"><i class="bi bi-trash"></i> 削除</button>
+      
+      <div id="waiting-area" class="d-flex gap-1 border-start ps-2"></div>
     </div>
   </div>
 
@@ -158,9 +161,15 @@
       b.onclick = function() { document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active')); this.classList.add('active'); currentFilter = filterMap[l]; draw(); };
       fb.appendChild(b);
     });
-    const saved = localStorage.getItem('rairai_pos_final_v26');
-    if (saved) { cases = JSON.parse(saved); activeCaseId = localStorage.getItem('rairai_pos_active_id') || Object.keys(cases)[0]; }
-    else { createNewCase(); }
+    
+    const saved = localStorage.getItem('rairai_pos_v27');
+    if (saved) { 
+      cases = JSON.parse(saved); 
+      activeCaseId = localStorage.getItem('rairai_pos_active_id') || Object.keys(cases)[0]; 
+    } else { 
+      createNewCase(); 
+    }
+    
     try { const res = await fetch(GAS_URL); cards = await res.json(); draw(); loadCase(activeCaseId); } catch(e) {}
     setInterval(refreshWaiting, 15000); refreshWaiting();
   };
@@ -250,7 +259,7 @@
     });
     
     b.innerHTML += `
-      <tr style="background-color: #f1f5f9; border-top: 2px solid #000; -webkit-print-color-adjust: exact;">
+      <tr style="background-color: #f1f5f9; border-top: 2px solid #000; -webkit-print-color-adjust: exact;" class="print-bg-gray">
         <td colspan="2" class="text-end fw-bold align-middle print-compress-text">合計査定額 (税込)</td>
         <td class="no-print"></td>
         <td class="print-only"></td>
@@ -276,12 +285,12 @@
     cases[activeCaseId].data = inputs;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      localStorage.setItem('rairai_pos_final_v26', JSON.stringify(cases));
+      localStorage.setItem('rairai_pos_v27', JSON.stringify(cases));
       localStorage.setItem('rairai_pos_active_id', activeCaseId);
     }, 500);
   }
 
-  // 🌟 切替バグの修正：明示的に関数を分けて、保存してから切り替える
+  // 🌟 ドロップダウンによる切り替え
   function switchCase(id) {
     saveCurrentCase();
     loadCase(id);
@@ -299,24 +308,40 @@
   }
   
   function createNewCase() { const id = "c_" + Date.now(); cases[id] = { name: "新規", data: {}, cancelIfSubMax: "希望しない" }; saveCurrentCase(); loadCase(id); }
-  function autoUpdateCaseName() { saveCurrentCase(); updateCaseListUI(); }
   
+  function autoUpdateCaseName() { 
+    saveCurrentCase(); 
+    updateCaseListUI(); 
+  }
+  
+  // 🌟 リストのUIをドロップダウン（select）に更新
   function updateCaseListUI() { 
-    const area = document.getElementById('case-list-area'); 
-    area.innerHTML = ""; 
+    const select = document.getElementById('case-select');
+    select.innerHTML = ""; 
     Object.keys(cases).forEach(id => { 
-      const b = document.createElement('div'); 
-      b.className = `case-badge ${id === activeCaseId ? 'active' : ''}`; 
-      b.setAttribute('data-id', id); 
-      // 🌟 onclick属性で確実に switchCase を呼ぶ
-      b.setAttribute('onclick', `switchCase('${id}')`);
-      b.innerHTML = `<span>${cases[id].name}</span><i class="bi bi-x-circle-fill del-btn" onclick="deleteCase(event, '${id}')"></i>`; 
-      area.appendChild(b); 
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.text = cases[id].name;
+      if (id === activeCaseId) opt.selected = true;
+      select.appendChild(opt);
     }); 
   }
   
-  function deleteCase(e, id) { e.stopPropagation(); if (Object.keys(cases).length <= 1) { inputs = {}; document.getElementById('cust-name').value = ""; saveCurrentCase(); loadCase(activeCaseId); return; } delete cases[id]; if (activeCaseId === id) activeCaseId = Object.keys(cases)[0]; saveCurrentCase(); loadCase(activeCaseId); }
+  // 🌟 削除機能を「現在の案件を削除」に変更
+  function deleteCurrentCase() { 
+    if(!confirm("表示中の案件を削除しますか？")) return;
+    if (Object.keys(cases).length <= 1) { 
+      inputs = {}; document.getElementById('cust-name').value = ""; 
+      saveCurrentCase(); loadCase(activeCaseId); return; 
+    } 
+    delete cases[activeCaseId]; 
+    activeCaseId = Object.keys(cases)[0]; 
+    saveCurrentCase(); 
+    loadCase(activeCaseId); 
+  }
+  
   async function finalizeTrade() { if(!confirm("確定して保存しますか？")) return; const btn = document.getElementById('btn-finalize'); btn.disabled = true; const tradeData = { action: "log_trade", customerName: document.getElementById('cust-name').value, tel: cases[activeCaseId].tel || "", totalQty: document.getElementById('t-qty').innerText, totalAmount: document.getElementById('t-amt').innerText.replace(/,/g, ''), items: Object.values(inputs).filter(i => i.q > 0) }; try { const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(tradeData) }); const json = await res.json(); if(json.result === "SUCCESS") { alert("保存完了"); delete cases[activeCaseId]; if(Object.keys(cases).length===0) createNewCase(); else { activeCaseId=Object.keys(cases)[0]; loadCase(activeCaseId); } hideReceipt(); } } catch(e) {} finally { btn.disabled = false; } }
+  
   async function refreshWaiting() { try { const res = await fetch(GAS_URL + "?action=getWaiting"); const list = await res.json(); document.getElementById('waiting-area').innerHTML = list.map((c, i) => `<button class="case-badge waiting-badge" onclick="importWaiting(${i})"><i class="bi bi-person-fill"></i> ${c.name.substr(0,4)}</button>`).join(''); } catch(e){} }
   async function importWaiting(idx) { const c = waitingList[idx]; if(!confirm(c.name + "様を読み込む？")) return; const id = "c_" + Date.now(); cases[id] = { name: c.name, tel: c.tel, cancelIfSubMax: c.cancelStatus, data: {} }; saveCurrentCase(); loadCase(id); }
   function resetAll() { if(confirm('全て消去しますか？')) { localStorage.clear(); location.reload(); } }
