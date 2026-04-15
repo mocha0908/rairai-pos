@@ -55,10 +55,10 @@
     .table-receipt th { background-color: #f8fafc; text-align: center; color: #64748b; font-size: 0.85rem; }
     .btn-delete-row { color: #ef4444; border: none; background: none; font-size: 1.2rem; cursor: pointer; }
     
-    /* 🌟 新設：表の外に出した合計金額エリア */
-    .summary-box { text-align: right; margin-top: 20px; padding: 10px 20px; page-break-inside: avoid; }
-    .summary-box .summary-label { font-size: 1.1rem; color: #64748b; font-weight: bold; margin-right: 15px; }
-    .summary-box .summary-amount { font-size: 2rem; font-weight: bold; color: var(--danger); border-bottom: 3px double var(--danger); }
+    /* 🌟 今回の魔法：見た目は独立、実はテーブルの一部 */
+    .footer-cell { border: none !important; background: transparent !important; text-align: right; padding-top: 30px !important; }
+    .summary-label { font-size: 1.2rem; color: #64748b; font-weight: bold; margin-right: 15px; }
+    .summary-amount { font-size: 2.2rem; font-weight: bold; color: var(--danger); border-bottom: 3px double var(--danger); }
 
     @media print {
       @page { size: A4; margin: 15mm; }
@@ -74,12 +74,16 @@
       .table-receipt th, .table-receipt td { border: 1px solid #ccc !important; padding: 8px 12px !important; color: #333 !important; }
       .table-receipt th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
       
-      /* 印刷時の合計エリア */
-      .summary-box .summary-amount { color: #000 !important; border-bottom: 3px double #000 !important; -webkit-print-color-adjust: exact; }
+      /* 印刷時の合計エリア（黒色化＆枠線無し維持） */
+      .footer-cell { border: none !important; }
+      .summary-label { color: #000 !important; }
+      .summary-amount { color: #000 !important; border-bottom: 3px double #000 !important; -webkit-print-color-adjust: exact; }
       
       .text-danger { color: #d9534f !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
       .receipt-title { border-bottom: 2px solid #333; padding-bottom: 5px; display: inline-block; margin-bottom: 15px; letter-spacing: 2px; }
+      .print-only { display: table-cell !important; }
     }
+    .print-only { display: none; }
   </style>
 </head>
 <body>
@@ -126,18 +130,21 @@
           <th style="width: 50%; text-align: left;">商品名 / ランク</th>
           <th style="width: 15%; text-align: center;">単価</th>
           <th style="width: 15%; text-align: center;" class="no-print">数量</th>
-          <th style="width: 15%; text-align: center; display:none;" class="d-print-table-cell">数量</th>
+          <th style="width: 15%; text-align: center;" class="print-only">数量</th>
           <th style="width: 15%; text-align: right;">小計</th>
           <th style="width: 5%; text-align: center;" class="no-print"></th>
         </tr>
       </thead>
       <tbody id="r-body"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="6" class="footer-cell">
+            <span class="summary-label">合計査定額 (税込)</span>
+            <span class="summary-amount" id="r-total-amt">¥ 0</span>
+          </td>
+        </tr>
+      </tfoot>
     </table>
-
-    <div class="summary-box">
-      <span class="summary-label">合計査定額 (税込)</span>
-      <span class="summary-amount" id="r-total-amt">¥ 0</span>
-    </div>
 
     <div class="mt-5 d-flex flex-column gap-3 no-print">
       <button class="btn btn-success btn-lg fw-bold shadow" onclick="window.print()"><i class="bi bi-printer"></i> 印刷・PDF保存</button>
@@ -165,7 +172,7 @@
       b.onclick = function() { document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active')); this.classList.add('active'); currentFilter = filterMap[l]; draw(); };
       fb.appendChild(b);
     });
-    const saved = localStorage.getItem('rairai_pos_v20');
+    const saved = localStorage.getItem('rairai_pos_v21');
     if (saved) { cases = JSON.parse(saved); activeCaseId = localStorage.getItem('rairai_pos_active_id') || Object.keys(cases)[0]; }
     else { createNewCase(); }
     try { const res = await fetch(GAS_URL); cards = await res.json(); draw(); loadCase(activeCaseId); } catch(e) {}
@@ -250,13 +257,12 @@
             <button class="qty-btn" onclick="changeQty('${i.n}','${i.t}',${i.p},1)">+</button>
           </div>
         </td>
-        <td class="text-center align-middle d-none d-print-table-cell fw-bold" style="font-size:1.1rem;">${i.q}</td>
+        <td class="text-center align-middle print-only fw-bold" style="font-size:1.1rem;">${i.q}</td>
         <td class="text-end align-middle fw-bold" style="font-size: 1.1rem;">¥${sub.toLocaleString()}</td>
         <td class="text-center align-middle no-print"><button class="btn-delete-row" onclick="deleteRow('${key}')"><i class="bi bi-trash3-fill"></i></button></td>
       </tr>`;
     });
     
-    // 合計を独立したブロックに出力
     document.getElementById('r-total-amt').innerText = "¥ " + total.toLocaleString();
     
     const cancelText = cases[activeCaseId].cancelIfSubMax === "希望する" 
@@ -276,7 +282,7 @@
     cases[activeCaseId].data = inputs;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      localStorage.setItem('rairai_pos_v20', JSON.stringify(cases));
+      localStorage.setItem('rairai_pos_v21', JSON.stringify(cases));
       localStorage.setItem('rairai_pos_active_id', activeCaseId);
     }, 500);
   }
