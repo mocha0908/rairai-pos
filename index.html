@@ -28,32 +28,46 @@
     .qty-num { width: 36px; border: none; text-align: center; background: transparent; font-weight: bold; font-size: 0.95rem; color: inherit; outline: none; padding: 0; }
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     .footer-bar { position: fixed; bottom: 0; width: 100%; background: var(--main); color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; z-index: 1050; }
+    
+    /* 履歴用 */
+    .log-item { background: white; margin: 10px; padding: 15px; border-radius: 8px; border-left: 5px solid var(--main); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+    /* 明細画面 */
     .receipt-container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; }
-    .table-receipt { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    .table-receipt { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1px solid #dee2e6; }
     .table-receipt th, .table-receipt td { border: 1px solid #dee2e6; padding: 12px 15px; vertical-align: middle; }
     .table-receipt th { background-color: #f8fafc; text-align: center; color: #64748b; font-size: 0.85rem; }
-    .btn-delete-row { color: #ef4444; border: none; background: none; font-size: 1.2rem; cursor: pointer; }
-    .log-item { background: white; margin: 10px; padding: 15px; border-radius: 8px; border-left: 5px solid var(--main); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .btn-delete-row { color: #ef4444; border: none; background: none; font-size: 1.2rem; cursor: pointer; padding: 0; }
     .print-only { display: none !important; }
 
-    /* --- 強力な印刷用スタイル --- */
+    /* 印刷時の「一つの塊」設定 */
     @media print {
-      @page { size: A4; margin: 10mm; }
-      body { background: #fff !important; color: #333 !important; font-size: 10pt; }
-      .no-print, #main-ui, .footer-bar, .btn-delete-row { display: none !important; }
-      .print-only { display: table-cell !important; }
-      #receipt { display: block !important; padding: 0 !important; margin: 0 !important; width: 100% !important; height: auto !important; }
-      .receipt-container { padding: 0 !important; width: 100% !important; max-width: 100% !important; }
+      @page { size: A4; margin: 0; } /* マージンを0にして制御しやすくする */
+      body { background: #fff !important; color: #333 !important; font-size: 10pt; margin: 10mm !important; }
+      .no-print, #main-ui, .footer-bar { display: none !important; }
+      .print-only { display: inline !important; }
       
-      /* テーブルの改ページを徹底的に抑制 */
-      .table-receipt { border: 2px solid #000 !important; page-break-inside: avoid !important; }
-      .table-receipt th, .table-receipt td { border: 1px solid #000 !important; padding: 4px 8px !important; line-height: 1.2 !important; }
-      .table-receipt tr { page-break-inside: avoid !important; }
+      #receipt { display: block !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
+      
+      /* 全体を一つの塊にする */
+      .receipt-container { 
+        display: block !important; 
+        padding: 0 !important; 
+        width: 100% !important; 
+        max-width: 100% !important; 
+        page-break-inside: avoid !important; /* コンテナ全体を分割させない */
+      }
+
+      .table-receipt { border: 1px solid #000 !important; }
+      .table-receipt th, .table-receipt td { border: 1px solid #000 !important; padding: 4px 8px !important; color: #000 !important; }
+      .table-receipt th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; }
+      
       .print-compress-text { font-size: 10pt !important; }
-      .print-compress-total { font-size: 12pt !important; }
+      .print-compress-total { font-size: 12pt !important; font-weight: bold !important; }
       
-      /* 合計金額行が離れないようにする */
-      tr.total-row { page-break-before: avoid !important; }
+      /* タイトルとメタ情報の装飾 */
+      .receipt-title { font-size: 16pt !important; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 15px; }
+      #receipt-meta { border: 1px solid #000 !important; margin-top: 0 !important; padding: 8px !important; }
     }
   </style>
 </head>
@@ -71,7 +85,7 @@
     <div class="d-flex align-items-center gap-2 overflow-auto pb-1">
       <button class="btn btn-primary btn-sm fw-bold px-3" onclick="createNewCase()">新規</button>
       <div id="case-list-area" class="d-flex gap-1"></div>
-      <select id="waiting-select" class="form-select form-select-sm fw-bold border-warning" onchange="handleWaitingSelect(this)">
+      <select id="waiting-select" class="form-select form-select-sm fw-bold border-warning" style="min-width: 180px; background-color: #fffbeb;" onchange="handleWaitingSelect(this)">
         <option value="">⏳ 待機中リスト...</option>
       </select>
     </div>
@@ -91,7 +105,7 @@
   </div>
 
   <div id="履歴モード" style="display:none; padding:10px;">
-    <h5 class="fw-bold"><i class="bi bi-clock-history"></i> 最近の買取履歴</h5>
+    <h5 class="fw-bold mb-3">最近の買取履歴</h5>
     <div id="logs-container"></div>
   </div>
 </div>
@@ -99,7 +113,7 @@
 <div id="receipt" style="display:none; background:white; min-height: 100vh;">
   <div class="receipt-container">
     <div class="text-center">
-      <h3 class="fw-bold receipt-title" style="border-bottom: 2px solid #333; display: inline-block; padding-bottom: 5px; margin-bottom: 20px;">買取査定明細書</h3>
+      <h3 class="fw-bold receipt-title">買取査定明細書</h3>
     </div>
     <div id="receipt-meta" class="mb-3 mt-1 p-3 bg-light border rounded fw-bold"></div>
     <table class="table-receipt">
@@ -108,12 +122,13 @@
           <th style="width: 45%; text-align: left;">商品名 / ランク</th>
           <th style="width: 15%; text-align: center;">単価</th>
           <th style="width: 20%; text-align: center;">数量</th>
-          <th style="width: 15%; text-align: right;">小計</th>
-          <th style="width: 5%; text-align: center;" class="no-print"></th>
+          <th style="width: 20%; text-align: right;">小計</th>
+          <th class="no-print" style="width: 5%;"></th>
         </tr>
       </thead>
       <tbody id="r-body"></tbody>
     </table>
+    
     <div class="mt-5 d-flex flex-column gap-3 no-print">
       <button class="btn btn-success btn-lg fw-bold shadow" onclick="window.print()"><i class="bi bi-printer"></i> 印刷・PDF保存</button>
       <button class="btn btn-primary btn-lg fw-bold shadow" id="btn-finalize" onclick="finalizeTrade()"><i class="bi bi-cloud-upload"></i> 買取確定・保存</button>
@@ -125,7 +140,7 @@
 <div class="footer-bar no-print">
   <div class="h3 m-0 fw-bold">¥<span id="t-amt">0</span> <small class="fs-6 opacity-75 ms-2"><span id="t-qty">0</span> 枚</small></div>
   <div class="d-flex gap-2">
-    <button class="btn btn-success btn-sm px-3 fw-bold" onclick="saveTemp()">クラウド保存</button>
+    <button class="btn btn-success btn-sm px-3 fw-bold" onclick="saveTemp()">一時保存</button>
     <button class="btn btn-outline-warning btn-sm px-4 rounded-pill fw-bold" onclick="resetAll()">全初期化</button>
   </div>
 </div>
@@ -134,7 +149,7 @@
   const GAS_URL = "https://script.google.com/macros/s/AKfycbwi7tWn74PWL-HD59oj7p1DZDdfddMn4wdJRJCCZJKznuBSLZ6GA88W6Lp-g1RrFkkSOw/exec";
   let cards = [], inputs = {}, activeCaseId = "default", cases = {}, currentFilter = "", waitingList = [];
 
-  const filterMap = {"あ":"^[あいうえおアイウエオ]","か":"^[かきくけこがぎぐげごカキクケコガギグゲゴ]","さ":"^[さしすせそざじずぜぞサシスセソザジズゼゾ]","た":"^[たちつてとだぢづでどタチツテトダヂヂヅデド]","な":"^[なにぬねのナニヌネノ]","は":"^[はひふへほばびぶべぼぱぴぷぺぽハヒフヘホバビブベボパピプペポ]","ま":"^[まみむめもマミムメモ]","や":"^[やゆよヤユヨ]","ら":"^[らりるれろラリルレロ]","わ":"^[わをんワヲン]"};
+  const filterMap = {"あ":"^[あいうえおアイウエオ]","か":"^[かきくけこがぎぐげご]","さ":"^[さしすせそざじずぜぞ]","た":"^[たちつてとだぢづでど]","な":"^[なにぬねの]","は":"^[はひふへほばびぶべぼぱぴぷぺぽ]","ま":"^[まみむめも]","や":"^[やゆよ]","ら":"^[らりるれろ]","わ":"^[わをん]"};
 
   window.onload = async () => {
     Object.keys(filterMap).forEach(l => {
@@ -149,8 +164,8 @@
   };
 
   function switchMode(m) {
-    document.getElementById('査定モード').style.display = m === 'main' ? 'block' : 'none';
-    document.getElementById('履歴モード').style.display = m === 'logs' ? 'block' : 'none';
+    document.getElementById('査定モード').style.display = (m === 'main' ? 'block' : 'none');
+    document.getElementById('履歴モード').style.display = (m === 'logs' ? 'block' : 'none');
     document.getElementById('btn-mode-main').classList.toggle('active', m === 'main');
     document.getElementById('btn-mode-logs').classList.toggle('active', m === 'logs');
     if(m === 'logs') loadTradeLogs();
@@ -206,13 +221,13 @@
             <input type="number" class="qty-num" value="${i.q}" onchange="updateQtyManually('${i.n}','${i.t}',${i.p},this.value)">
             <button class="qty-btn" onclick="changeQty('${i.n}','${i.t}',${i.p},1)">+</button>
           </div>
-          <span class="print-only print-compress-text">${i.q}</span>
+          <span class="print-only print-compress-text" style="font-weight:bold;">${i.q}</span>
         </td>
         <td class="text-end fw-bold print-compress-text">¥${sub.toLocaleString()}</td>
         <td class="no-print text-center"><button class="btn-delete-row" onclick="deleteRow('${key}')"><i class="bi bi-trash3-fill"></i></button></td>
       </tr>`;
     });
-    b.innerHTML += `<tr style="background:#f1f5f9;" class="total-row"><td colspan="2" class="text-end fw-bold print-compress-text">合計査定額</td><td class="text-center print-compress-text">${document.getElementById('t-qty').innerText}</td><td class="text-end text-danger fw-bold print-compress-total" style="font-size:1.4rem;">¥${total.toLocaleString()}</td><td class="no-print"></td></tr>`;
+    b.innerHTML += `<tr style="background:#f1f5f9; -webkit-print-color-adjust: exact;"><td colspan="2" class="text-end fw-bold print-compress-text">合計査定額</td><td class="text-center print-compress-text" style="font-weight:bold;">${document.getElementById('t-qty').innerText}</td><td class="text-end text-danger fw-bold print-compress-total" style="font-size:1.4rem;">¥${total.toLocaleString()}</td><td class="no-print"></td></tr>`;
     document.getElementById('receipt-meta').innerHTML = `氏名: ${document.getElementById('cust-name').value || "未指定"} 様 ${cases[activeCaseId].cancelIfSubMax === "希望する" ? "<br><span class='text-danger'>【！！満額査定以外返送希望！！】</span>" : ""}`;
   }
 
@@ -275,7 +290,7 @@
     try {
       const res = await fetch(GAS_URL + "?action=getTradeLogs");
       const logs = await res.json();
-      container.innerHTML = logs.map(l => `<div class="log-item"><div class="d-flex justify-content-between"><b>${l.name} 様 (${l.date})</b><span class="text-danger fw-bold">¥${Number(l.totalAmount).toLocaleString()}</span></div><div class="small">${l.totalQty}枚</div><button class="btn btn-sm btn-link p-0" onclick='alert("内容:\\n" + JSON.parse(${JSON.stringify(l.items)}).map(i=>i.n+" x"+i.q).join("\\n"))'>詳細を表示</button></div>`).join('');
+      container.innerHTML = logs.map(l => `<div class="log-item"><div class="d-flex justify-content-between"><b>${l.name} 様 (${l.date})</b><span class="text-danger fw-bold">¥${Number(l.totalAmount).toLocaleString()}</span></div><div class="small">${l.totalQty}枚</div><button class="btn btn-sm btn-link p-0" onclick='alert("内容詳細:\\n" + JSON.parse(${JSON.stringify(l.items)}).map(i=>i.n+" ("+i.t+") x"+i.q).join("\\n"))'>詳細を表示</button></div>`).join('');
     } catch(e) { container.innerHTML = "取得失敗"; }
   }
 
