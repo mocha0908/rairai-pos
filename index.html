@@ -7,30 +7,30 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <style>
-    :root { --main: #0d124a; --bg: #f1f5f9; --accent: #facc15; --danger: #ef4444; --success: #22c55e; }
+    :root { --main: #0d124a; --bg: #f1f5f9; --accent: #facc15; --danger: #ef4444; }
     body { background: var(--bg); color: #333; padding-bottom: 120px; font-family: sans-serif; }
     .sticky-top { background: #fff; border-bottom: 2px solid var(--main); padding: 10px 15px !important; z-index: 1020; }
     .case-badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; background: white; cursor: pointer; min-width: 80px; margin-right: 5px; }
     .case-badge.active { background: var(--main); color: white; border-color: var(--main); }
+    .case-badge .del-btn { color: #94a3b8; font-size: 1.1rem; padding-left: 5px; cursor: pointer; }
+    .case-badge.active .del-btn { color: #fff; opacity: 0.7; }
     .search-area { background: #fff; padding: 10px 15px; border-bottom: 1px solid #e2e8f0; }
     .filter-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 8px; }
     .filter-btn { padding: 6px 0; font-size: 0.75rem; font-weight: bold; border-radius: 4px; border: 1px solid #ddd; background: #fff; text-align: center; }
     .filter-btn.active { background: #64748b; color: white; }
-    .main-table-container { background: white; margin: 10px; border-radius: 10px; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .main-table { width: 100%; min-width: 650px; border-collapse: collapse; }
-    .main-table th { background: #f8fafc; padding: 12px; font-size: 0.75rem; text-align: center; color: #64748b; }
-    .main-table td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
     .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 15px; padding: 15px; }
     .grid-item { background: white; border-radius: 12px; padding: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; min-height: 400px; }
     .grid-item.has-value { border: 2px solid var(--main); background: #fffbeb; }
     .grid-img { width: 100%; height: 130px; object-fit: contain; margin-bottom: 10px; background: #f8fafc; }
     .qty-ctrl { display: inline-flex; align-items: center; border-radius: 4px; border: 1px solid #cbd5e1; overflow: hidden; background: #fff; }
     .qty-ctrl.has-value { background: var(--main); color: white; border-color: var(--main); }
+    .qty-btn { border: none; background: transparent; color: inherit; width: 26px; height: 28px; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
+    .qty-num { width: 36px; border: none; text-align: center; background: transparent; font-weight: bold; font-size: 0.95rem; color: inherit; outline: none; padding: 0; }
     .footer-bar { position: fixed; bottom: 0; width: 100%; background: var(--main); color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; z-index: 1050; }
     .receipt-container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; }
     .table-receipt { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    .table-receipt th, .table-receipt td { border: 1px solid #dee2e6; padding: 10px; }
-    .log-item { background: white; margin: 8px; padding: 12px; border-radius: 8px; border-left: 5px solid var(--main); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .table-receipt th, .table-receipt td { border: 1px solid #dee2e6; padding: 12px 15px; }
+    .log-item { background: white; margin: 10px; padding: 15px; border-radius: 8px; border-left: 5px solid var(--main); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     @media print { .no-print { display: none !important; } #receipt { display: block !important; } }
   </style>
 </head>
@@ -41,15 +41,14 @@
     <div class="d-flex justify-content-between align-items-center mb-2">
       <div class="fw-bold" style="color:var(--main);">RAIRAI POS SYSTEM</div>
       <div class="btn-group">
-        <button class="btn btn-sm btn-outline-dark active" id="btn-view-main" onclick="switchMainView('main')">査定</button>
-        <button class="btn btn-sm btn-outline-dark" id="btn-view-logs" onclick="switchMainView('logs')">履歴</button>
+        <button id="btn-main" class="btn btn-sm btn-outline-dark active" onclick="switchViewMode('main')">査定</button>
+        <button id="btn-logs" class="btn btn-sm btn-outline-dark" onclick="switchViewMode('logs')">履歴</button>
       </div>
     </div>
-    
-    <div id="case-area" class="d-flex align-items-center gap-2 overflow-auto pb-1">
+    <div class="d-flex align-items-center gap-2 overflow-auto pb-1">
       <button class="btn btn-primary btn-sm fw-bold px-3" onclick="createNewCase()">新規</button>
       <div id="case-list-area" class="d-flex gap-1"></div>
-      <select id="waiting-select" class="form-select form-select-sm fw-bold border-warning" style="min-width: 150px;" onchange="handleWaitingSelect(this)">
+      <select id="waiting-select" class="form-select form-select-sm fw-bold border-warning" style="min-width: 180px; background-color: #fffbeb;" onchange="handleWaitingSelect(this)">
         <option value="">⏳ 待機中リスト...</option>
       </select>
     </div>
@@ -68,24 +67,24 @@
     <div id="display-container"></div>
   </div>
 
-  <div id="履歴モード" style="display:none; padding: 10px;">
-    <h5 class="fw-bold"><i class="bi bi-clock-history"></i> 最近の買取履歴 (50件)</h5>
+  <div id="履歴モード" style="display:none; padding:10px;">
+    <h5 class="fw-bold mb-3">最近の買取履歴</h5>
     <div id="logs-container"></div>
   </div>
 </div>
 
 <div id="receipt" style="display:none; background:white; min-height: 100vh;">
   <div class="receipt-container">
-    <div class="text-center"><h3 class="fw-bold">買取査定明細書</h3></div>
+    <h3 class="fw-bold text-center receipt-title">買取査定明細書</h3>
     <div id="receipt-meta" class="mb-3 mt-3 p-3 bg-light border rounded fw-bold"></div>
     <table class="table-receipt">
       <thead><tr><th>商品名 / ランク</th><th>単価</th><th class="no-print">数量</th><th class="print-only">数量</th><th>小計</th><th class="no-print"></th></tr></thead>
       <tbody id="r-body"></tbody>
     </table>
     <div class="mt-5 d-flex flex-column gap-3 no-print">
-      <button class="btn btn-success btn-lg fw-bold" onclick="window.print()"><i class="bi bi-printer"></i> 印刷・PDF保存</button>
-      <button class="btn btn-primary btn-lg fw-bold" id="btn-finalize" onclick="finalizeTrade()"><i class="bi bi-cloud-upload"></i> 買取確定・保存</button>
-      <button class="btn btn-outline-secondary py-3" onclick="hideReceipt()">編集に戻る</button>
+      <button class="btn btn-success btn-lg fw-bold shadow" onclick="window.print()"><i class="bi bi-printer"></i> 印刷・PDF保存</button>
+      <button class="btn btn-primary btn-lg fw-bold shadow" id="btn-finalize" onclick="finalizeTrade()"><i class="bi bi-cloud-upload"></i> 買取確定・保存</button>
+      <button class="btn btn-outline-secondary py-3 fw-bold" onclick="hideReceipt()">編集に戻る</button>
     </div>
   </div>
 </div>
@@ -93,14 +92,14 @@
 <div class="footer-bar no-print">
   <div class="h3 m-0 fw-bold">¥<span id="t-amt">0</span> <small class="fs-6 opacity-75 ms-2"><span id="t-qty">0</span> 枚</small></div>
   <div class="d-flex gap-2">
-    <button class="btn btn-success btn-sm px-3 fw-bold" onclick="saveTemp()"><i class="bi bi-cloud-arrow-up"></i> 一時保存</button>
-    <button class="btn btn-outline-warning btn-sm" onclick="resetAll()">初期化</button>
+    <button class="btn btn-success btn-sm px-3 fw-bold shadow-sm" onclick="saveTemp()">クラウド保存</button>
+    <button class="btn btn-outline-warning btn-sm px-4 rounded-pill fw-bold" onclick="resetAll()">全初期化</button>
   </div>
 </div>
 
 <script>
   const GAS_URL = "https://script.google.com/macros/s/AKfycbwi7tWn74PWL-HD59oj7p1DZDdfddMn4wdJRJCCZJKznuBSLZ6GA88W6Lp-g1RrFkkSOw/exec";
-  let cards = [], inputs = {}, activeCaseId = "default", cases = {}, currentFilter = "", currentView = "grid", waitingList = [];
+  let cards = [], inputs = {}, activeCaseId = "default", cases = {}, currentFilter = "", waitingList = [];
 
   const filterMap = {"あ":"^[あいうえおアイウエオｱｲｳｴｵ]","か":"^[かきくけこがぎぐげごカキクケコガギグゲゴｶｷｸｹｺｶﾞｷﾞｸﾞｹﾞｺﾞ]","さ":"^[さしすせそざじずぜぞサシスセソザジズゼゾｻｼｽｾｿｻﾞｼﾞｽﾞｾﾞｿﾞ]","た":"^[たちつてとだぢづでどタチツテトダヂヂヅデドﾀﾁﾂﾃﾄﾀﾞﾁﾞﾂﾞﾃﾞﾄﾞ]","な":"^[なにぬねのナニヌネノﾅﾆヌネノ]","は":"^[はひふへほばびぶべぼぱぴぷぺぽハヒフヘホバビブベボパピプペポﾊﾋﾌﾍﾎﾊﾞﾋﾞﾌﾞﾍﾞﾎﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ]","ま":"^[まみむめもマミムメモﾏﾐﾑメモ]","や":"^[やゆよヤユヨﾔﾕﾖ]","ら":"^[らりるれろラリルレロﾗﾘﾙﾚﾛ]","わ":"^[わをんワヲンﾜｦﾝ]"};
 
@@ -116,62 +115,28 @@
     setInterval(refreshWaiting, 15000); refreshWaiting();
   };
 
-  function switchMainView(mode) {
+  function switchViewMode(mode) {
     document.getElementById('査定モード').style.display = mode === 'main' ? 'block' : 'none';
     document.getElementById('履歴モード').style.display = mode === 'logs' ? 'block' : 'none';
-    document.getElementById('btn-view-main').classList.toggle('active', mode === 'main');
-    document.getElementById('btn-view-logs').classList.toggle('active', mode === 'logs');
+    document.getElementById('btn-main').classList.toggle('active', mode === 'main');
+    document.getElementById('btn-logs').classList.toggle('active', mode === 'logs');
     if(mode === 'logs') loadTradeLogs();
   }
 
-  // 🌟【追加】一時保存処理
-  async function saveTemp() {
-    const c = cases[activeCaseId];
-    if(!c.name || c.name === "新規") return alert("顧客名を入力してください");
-    const tradeData = { 
-      action: "save_temp", customerName: c.name, tel: c.tel || "", 
-      totalQty: document.getElementById('t-qty').innerText, totalAmount: document.getElementById('t-amt').innerText.replace(/,/g, ''),
-      items: Object.values(inputs).filter(i => i.q > 0)
-    };
-    try {
-      const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(tradeData) });
-      if((await res.json()).result === "SUCCESS") alert("クラウドに一時保存しました");
-    } catch(e) { alert("保存失敗"); }
-  }
-
-  // 🌟【追加】履歴読み込み
-  async function loadTradeLogs() {
-    const container = document.getElementById('logs-container');
-    container.innerHTML = "読み込み中...";
-    try {
-      const res = await fetch(GAS_URL + "?action=getTradeLogs");
-      const logs = await res.json();
-      container.innerHTML = logs.map(l => `
-        <div class="log-item">
-          <div class="d-flex justify-content-between">
-            <span class="fw-bold">${l.date} - ${l.name} 様</span>
-            <span class="text-danger fw-bold">¥${Number(l.totalAmount).toLocaleString()}</span>
-          </div>
-          <div class="small text-secondary">${l.totalQty}点 査定完了</div>
-          <button class="btn btn-sm btn-link p-0" onclick='alert(\`詳細:\\n\${JSON.parse(l.items).map(i=>i.n+"("+i.t+")x"+i.q).join("\\n")}\`)'>内容を表示</button>
-        </div>
-      `).join('');
-    } catch(e) { container.innerHTML = "履歴の取得に失敗しました"; }
-  }
-
-  // 以下、既存の基本機能（draw, changeQty, loadCase等）
-  function updateQtyManually(name, type, price, val) {
-    const key = name + '-' + type;
-    let q = parseInt(val, 10);
-    if (isNaN(q) || q <= 0) { delete inputs[key]; } else { inputs[key] = { n: name, t: type, p: price, q: q }; }
-    saveCurrentCase(); calc(); draw();
-  }
   function changeQty(name, type, price, delta) {
     const key = name + '-' + type;
     let q = (inputs[key]?.q || 0) + delta;
     if (q <= 0) delete inputs[key]; else inputs[key] = { n: name, t: type, p: price, q: q };
     saveCurrentCase(); calc(); draw();
   }
+
+  function updateQtyManually(name, type, price, val) {
+    const key = name + '-' + type;
+    let q = parseInt(val, 10);
+    if (isNaN(q) || q <= 0) { delete inputs[key]; } else { inputs[key] = { n: name, t: type, p: price, q: q }; }
+    saveCurrentCase(); calc(); draw();
+  }
+
   function draw() {
     const container = document.getElementById('display-container');
     const sw = document.getElementById('search').value.toLowerCase();
@@ -180,30 +145,34 @@
     html += filtered.map(c => {
       const rows = ['S','A','B','C','D'].map(t => {
         const q = inputs[c.name+'-'+t]?.q || 0; const p = c['price'+t] || 0;
-        return `<tr><td style="width:20px; font-weight:900">${t}</td><td class="price-tag">¥${p.toLocaleString()}</td><td class="text-end"><div class="qty-ctrl ${q>0?'has-value':''}"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${p},-1)">-</button><input type="number" class="qty-num" value="${q||''}" onchange="updateQtyManually('${c.name}','${t}',${p},this.value)" placeholder="0"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${p},1)">+</button></div></td></tr>`;
+        return `<tr><td style="width:20px; font-weight:900">${t}</td><td style="color:var(--danger); font-weight:bold;">¥${p.toLocaleString()}</td><td class="text-end"><div class="qty-ctrl ${q>0?'has-value':''}"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${p},-1)">-</button><input type="number" class="qty-num" value="${q||''}" onchange="updateQtyManually('${c.name}','${t}',${p},this.value)" placeholder="0"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${p},1)">+</button></div></td></tr>`;
       }).join('');
       const hasV = ['S','A','B','C','D'].some(t => inputs[c.name+'-'+t]?.q > 0);
-      return `<div class="grid-item ${hasV?'has-value':''}"><img src="${c.image}" class="grid-img"><div class="grid-card-name" style="font-size:0.75rem;font-weight:bold;">${c.name}</div><table style="width:100%;font-size:0.75rem;">${rows}</table></div>`;
+      return `<div class="grid-item ${hasV?'has-value':''}"><img src="${c.image}" class="grid-img"><div style="font-size:0.75rem; font-weight:bold; height:3em;">${c.name}</div><table style="width:100%; font-size:0.75rem;">${rows}</table></div>`;
     }).join('');
     container.innerHTML = html + `</div>`;
   }
+
   function calc() {
     let tq = 0, ta = 0; Object.values(inputs).forEach(i => { tq += i.q; ta += (i.q * i.p); });
     document.getElementById('t-qty').innerText = tq;
     document.getElementById('t-amt').innerText = ta.toLocaleString();
   }
+
   function showReceipt() {
     document.getElementById('main-ui').style.display='none'; document.getElementById('receipt').style.display='block';
     const b = document.getElementById('r-body'); b.innerHTML = ""; let total = 0;
     Object.keys(inputs).forEach(key => {
       const i = inputs[key]; const sub = i.q * i.p; total += sub;
-      b.innerHTML += `<tr><td><b>${i.n}</b><br><small>【${i.t}】</small></td><td>¥${i.p.toLocaleString()}</td><td class="no-print">${i.q}</td><td class="print-only">${i.q}</td><td>¥${sub.toLocaleString()}</td><td class="no-print"><button class="btn btn-sm text-danger" onclick="deleteRow('${key}')"><i class="bi bi-trash"></i></button></td></tr>`;
+      b.innerHTML += `<tr><td><b>${i.n}</b><br><small>ランク:${i.t}</small></td><td>¥${i.p.toLocaleString()}</td><td class="no-print">${i.q}</td><td class="print-only">${i.q}</td><td>¥${sub.toLocaleString()}</td><td class="no-print"><button class="btn btn-sm text-danger" onclick="deleteRow('${key}')"><i class="bi bi-trash"></i></button></td></tr>`;
     });
-    b.innerHTML += `<tr class="table-dark"><td colspan="2">合計</td><td class="no-print"></td><td class="print-only"></td><td colspan="2">¥${total.toLocaleString()}</td></tr>`;
-    document.getElementById('receipt-meta').innerHTML = `氏名: ${document.getElementById('cust-name').value} 様 ${cases[activeCaseId].cancelIfSubMax === "希望する" ? "<br><span class='text-danger'>※満額以外返送希望</span>" : ""}`;
+    b.innerHTML += `<tr style="background:#f1f5f9; font-weight:bold;"><td colspan="2">合計査定額</td><td class="no-print"></td><td class="print-only"></td><td colspan="2" style="font-size:1.4rem; color:var(--danger);">¥${total.toLocaleString()}</td></tr>`;
+    document.getElementById('receipt-meta').innerHTML = `氏名: ${document.getElementById('cust-name').value || "未指定"} 様 ${cases[activeCaseId].cancelIfSubMax === "希望する" ? "<br><span class='text-danger'>【！！満額査定以外返送希望！！】</span>" : ""}`;
   }
+
   function hideReceipt() { document.getElementById('receipt').style.display='none'; document.getElementById('main-ui').style.display='block'; }
   function deleteRow(key) { delete inputs[key]; saveCurrentCase(); calc(); showReceipt(); }
+
   function saveCurrentCase() {
     if(!cases[activeCaseId]) return;
     cases[activeCaseId].name = document.getElementById('cust-name').value || "新規";
@@ -211,25 +180,28 @@
     localStorage.setItem('rairai_pos_v29', JSON.stringify(cases));
     localStorage.setItem('rairai_pos_active_id', activeCaseId);
   }
+
   function loadCase(id) {
-    activeCaseId = id; inputs = cases[id].data || {};
+    if(!cases[id]) return; activeCaseId = id; inputs = cases[id].data || {};
     document.getElementById('cust-name').value = cases[id].name === "新規" ? "" : cases[id].name;
-    document.getElementById('cancel-banner').style.display = cases[id].cancelIfSubMax === "希望する" ? "block" : "none";
+    document.getElementById('cancel-banner').style.display = (cases[id].cancelIfSubMax === "希望する") ? "block" : "none";
     calc(); draw(); updateCaseListUI();
   }
+
   function createNewCase() { const id = "c_" + Date.now(); cases[id] = { name: "新規", data: {}, cancelIfSubMax: "希望しない" }; saveCurrentCase(); loadCase(id); }
   function autoUpdateCaseName() { saveCurrentCase(); updateCaseListUI(); }
   function updateCaseListUI() {
     const area = document.getElementById('case-list-area'); area.innerHTML = "";
     Object.keys(cases).forEach(id => {
       const b = document.createElement('div'); b.className = `case-badge ${id === activeCaseId ? 'active' : ''}`;
-      b.onclick = () => loadCase(id); b.innerHTML = `<span>${cases[id].name}</span><i class="bi bi-x-circle-fill ms-1" onclick="deleteCase(event, '${id}')"></i>`;
+      b.onclick = () => loadCase(id); b.innerHTML = `<span>${cases[id].name}</span><i class="bi bi-x-circle-fill del-btn" onclick="deleteCase(event, '${id}')"></i>`;
       area.appendChild(b);
     });
   }
   function deleteCase(e, id) { e.stopPropagation(); if(confirm("削除しますか？")){ delete cases[id]; if(activeCaseId===id) activeCaseId=Object.keys(cases)[0]; saveCurrentCase(); loadCase(activeCaseId || createNewCase()); } }
+
   async function finalizeTrade() {
-    if(!confirm("確定しますか？")) return;
+    if(!confirm("確定して保存しますか？")) return;
     const c = cases[activeCaseId];
     const tradeData = { 
       action: "log_trade", customerName: document.getElementById('cust-name').value, tel: c.tel || "", 
@@ -239,9 +211,28 @@
     };
     try {
       const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(tradeData) });
-      if((await res.json()).result === "SUCCESS") { alert("保存しました"); delete cases[activeCaseId]; location.reload(); }
+      if((await res.json()).result === "SUCCESS") { alert("保存完了"); delete cases[activeCaseId]; location.reload(); }
     } catch(e) { alert("失敗"); }
   }
+
+  async function saveTemp() {
+    const c = cases[activeCaseId]; if(!c.name || c.name === "新規") return alert("顧客名を入力してください");
+    try {
+      const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "save_temp", customerName: c.name, tel: c.tel, items: inputs, totalQty: document.getElementById('t-qty').innerText, totalAmount: document.getElementById('t-amt').innerText }) });
+      alert("一時保存しました");
+    } catch(e) { alert("失敗"); }
+  }
+
+  async function loadTradeLogs() {
+    const container = document.getElementById('logs-container');
+    container.innerHTML = "読み込み中...";
+    try {
+      const res = await fetch(GAS_URL + "?action=getTradeLogs");
+      const logs = await res.json();
+      container.innerHTML = logs.map(l => `<div class="log-item"><div class="d-flex justify-content-between"><b>${l.name} 様 (${l.date})</b><span class="text-danger fw-bold">¥${Number(l.totalAmount).toLocaleString()}</span></div><div class="small">${l.totalQty}枚 買取済み</div><button class="btn btn-sm btn-link p-0" onclick='alert("内容:\\n" + JSON.parse(${JSON.stringify(l.items)}).map(i=>i.n+" x"+i.q).join("\\n"))'>詳細を表示</button></div>`).join('');
+    } catch(e) { container.innerHTML = "取得失敗"; }
+  }
+
   async function refreshWaiting() {
     try {
       const res = await fetch(GAS_URL + "?action=getWaiting");
@@ -250,6 +241,7 @@
       select.innerHTML = `<option value="">⏳ 待機中 (${waitingList.length}名)...</option>` + waitingList.map((c, i) => `<option value="${i}">${c.name} 様</option>`).join('');
     } catch(e){}
   }
+
   async function handleWaitingSelect(selectObj) {
     const c = waitingList[selectObj.value]; if(!c) return;
     if(!confirm(`${c.name} 様の査定を開始しますか？`)) return;
@@ -259,6 +251,7 @@
     await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "update_status", customerName: c.name, newStatus: "査定中" }) });
     refreshWaiting();
   }
+
   function resetAll() { if(confirm('全て消去しますか？')) { localStorage.clear(); location.reload(); } }
 </script>
 </body>
