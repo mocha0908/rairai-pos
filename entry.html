@@ -16,7 +16,11 @@
     .status-msg { font-size: 0.8rem; font-weight: bold; padding: 12px; border-radius: 4px; margin-bottom: 15px; display: none; border: 1px solid transparent; }
     .msg-success { background: #d1e7dd; border-color: #badbcc; color: #0f5132; }
     .msg-error { background: #f8d7da; border-color: #f5c2c7; color: #842029; }
-    .terms-box { background: #fff; border: 1px solid #dee2e6; padding: 15px; font-size: 0.7rem; height: 200px; overflow-y: scroll; margin-bottom: 15px; line-height: 1.6; color: #444; white-space: pre-wrap; border-radius: 4px; }
+    .terms-box { 
+      background: #fff; border: 1px solid #dee2e6; padding: 15px; font-size: 0.7rem; 
+      height: 200px; overflow-y: scroll; margin-bottom: 15px; line-height: 1.6; 
+      color: #444; white-space: pre-wrap; border-radius: 4px;
+    }
     .btn-submit { background: var(--main); color: white; width: 100%; padding: 15px; font-weight: bold; margin-top: 20px; border-radius: 4px; border: none; }
     .cancel-check-area { background: #fff3cd; padding: 15px; border-radius: 4px; margin-top: 15px; border: 1px solid #ffeeba; }
     .field-masked { background-color: #e9ecef !important; border-color: #ced4da; }
@@ -26,10 +30,13 @@
 <body>
 <div class="container">
   <h5 class="fw-bold text-center mb-4">買取査定お申込フォーム</h5>
+  
   <div id="statusMsg" class="status-msg"></div>
+
   <div class="card p-4 shadow-sm">
     <form id="entryForm" class="h-adr">
       <span class="p-country-name" style="display:none;">Japan</span>
+
       <div class="section-title">本人確認</div>
       <div class="row g-2">
         <div class="col-6"><label class="form-label">氏名</label><input type="text" id="name" class="form-control" placeholder="山田 太郎" required></div>
@@ -47,6 +54,7 @@
           <div class="col-4"><label class="form-label">郵便番号</label><input type="text" id="zip" class="form-control p-postal-code" placeholder="1234567"></div>
           <div class="col-8"><label class="form-label">現住所</label><input type="text" id="addressText" class="form-control need-req p-region p-locality p-street-address p-extended-address" placeholder="市区町村・番地・建物名" required></div>
         </div>
+        
         <div class="row g-2 mt-2">
           <div class="col-5">
             <label class="form-label">身分証種類</label>
@@ -61,6 +69,7 @@
           </div>
           <div class="col-7"><label class="form-label">身分証番号</label><input type="text" id="idNum" class="form-control need-req" placeholder="免許証番号など" required></div>
         </div>
+
         <div class="mt-3 border-bottom pb-1 fw-bold small text-secondary">振込先口座</div>
         <div class="row g-2 mt-1">
           <div class="col-6"><input type="text" id="bankName" class="form-control form-control-sm need-req" placeholder="銀行名" required></div>
@@ -74,65 +83,145 @@
       <div class="cancel-check-area">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="cancelIfSubMax">
-          <label class="form-check-label small fw-bold text-danger" for="cancelIfSubMax">満額（状態S）査定以外の場合はキャンセルする</label>
+          <label class="form-check-label small fw-bold text-danger" for="cancelIfSubMax">
+            満額（状態S）査定以外の場合はキャンセルする
+          </label>
         </div>
       </div>
 
-      <div class="section-title mt-4">利用規約</div>
-      <div class="terms-box">規約内容（省略）</div>
-      <div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="agree" required><label class="form-check-label fw-bold small" for="agree">同意する</label></div>
-      <button type="submit" id="submitBtn" class="btn btn-submit shadow">査定を申し込む</button>
+      <div class="section-title mt-4">郵送買取利用規約</div>
+      <div class="terms-box">■ 郵送買取利用規約・同意事項
+
+【1】査定および買取成立について
+・査定結果は、商品到着後、当店基準に基づき決定いたします。
+・査定結果の通知はLINEまたは指定の連絡手段にて行います。通知後3日以内にご返信がない場合は、提示価格に承諾したものとみなし、買取を成立させていただきます。
+
+【2】キャンセル・返送について
+・査定金額にご納得いただけない場合はキャンセルが可能です。
+・「満額査定以外キャンセル」を選択された場合、当店基準で状態S（満額）に満たない商品があった時点で、買取は不成立となり全品を返送いたします。
+・キャンセル時の返送料は、いかなる理由であってもお客様負担（着払い）となります。
+
+【3】商品の取り扱いについて
+・カードの状態評価（キズ・スレ・凹み・反り等）は当店独自の基準で行います。他店様の評価と異なる場合があることをご了承ください。
+・スリーブ、ローダー、バインダー等の梱包材は査定対象外です。返却の保証いかなる理由であってもいたしかねますので、あらかじめ外して発送してください。
+
+【4】配送および紛失について
+・配送中の事故、紛失、破損について、当店は一切の責任を負いません。適切な梱包と補償のある配送方法を推奨いたします。
+
+【5】本人確認と支払いについて
+・古物営業法に基づき、本人確認書類の提出が必須です。
+・振込先口座は、お申込者本人名義のものに限ります。
+・買取成立後、原則2営業日以内にお振込みいたします。振込手数料はお客様負担となります。
+
+【6】その他
+・申込内容に虚偽があった場合、取引を中止し、警察へ通報する場合があります。
+・本規約は、お申込みをいただいた時点で全項目に同意したものとみなします。</div>
+
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" id="agree" required>
+        <label class="form-check-label fw-bold small" for="agree">利用規約に同意する</label>
+      </div>
+
+      <button type="submit" id="submitBtn" class="btn btn-submit shadow">規約に同意して査定を申し込む</button>
     </form>
   </div>
 </div>
 
 <script>
-  // ★ここに新しいデプロイURLを貼る
+  // ★ここに新しいデプロイURLを貼り付けてください
   const GAS_URL = "https://script.google.com/macros/s/AKfycbwi7tWn74PWL-HD59oj7p1DZDdfddMn4wdJRJCCZJKznuBSLZ6GA88W6Lp-g1RrFkkSOw/exec";
   let matchedData = null;
 
-  document.getElementById('birthday').oninput = function() { this.value = this.value.replace(/\D/g, ''); };
+  // 生年月日入力：数字以外を排除
+  document.getElementById('birthday').oninput = function() {
+    this.value = this.value.replace(/\D/g, '');
+  };
 
+  // 登録情報の照合（リピーター対応）
   document.getElementById('checkBtn').onclick = async function() {
     const name = document.getElementById('name').value.trim();
     const tel = document.getElementById('tel').value.trim();
-    if(!name || !tel) return alert("氏名と電話番号を入力してください");
+    if(!name || !tel) return alert("照合には氏名と電話番号を入力してください。");
+
+    const msg = document.getElementById('statusMsg');
     this.disabled = true;
+    msg.style.display = "block";
+    msg.className = "status-msg";
+    msg.innerText = "過去の登録情報を確認中...";
+
     try {
       const res = await fetch(`${GAS_URL}?action=search_full&searchTel=${tel.replace(/\D/g, '')}&searchName=${encodeURIComponent(name)}`);
       const json = await res.json();
+      
       if(json.found) {
         matchedData = json.data;
-        alert("過去の登録情報が見つかりました。変更箇所のみ入力してください。");
-        document.querySelectorAll('.need-req').forEach(el => { el.required = false; el.classList.add('field-masked'); el.placeholder = "登録済データあり"; });
-      } else { alert("登録情報が見つかりませんでした。"); }
-    } catch(e) { alert("照合エラー"); } finally { this.disabled = false; }
+        msg.className = "status-msg msg-success";
+        msg.innerText = "登録情報を確認しました！ 変更がある項目のみ入力してください。";
+
+        document.querySelectorAll('.need-req').forEach(el => {
+          el.required = false;
+          el.placeholder = "登録データあり (変更時のみ入力)";
+          el.classList.add('field-masked');
+        });
+      } else {
+        matchedData = null;
+        msg.className = "status-msg msg-error";
+        msg.innerText = "登録情報が見つかりませんでした。全項目を入力してください。";
+        document.querySelectorAll('.need-req').forEach(el => {
+          el.required = true;
+          el.classList.remove('field-masked');
+        });
+      }
+    } catch(e) {
+      alert("通信エラーが発生しました。");
+    } finally {
+      this.disabled = false;
+    }
   };
 
+  // 送信処理
   document.getElementById('entryForm').onsubmit = async (e) => {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
     btn.disabled = true; btn.innerText = "送信中...";
-    const getVal = (id) => {
-      const v = document.getElementById(id).value.trim();
-      return (v === "" && matchedData) ? matchedData[id] : v;
+
+    const getRealVal = (id) => {
+      const val = document.getElementById(id).value.trim();
+      if (val === "" && matchedData && matchedData[id]) return matchedData[id];
+      return val;
     };
+
     const data = {
       action: "customer_register",
       customerDetail: {
         name: document.getElementById('name').value.trim(),
         tel: document.getElementById('tel').value.trim(),
-        kana: getVal('kana'), birthday: getVal('birthday'),
-        idType: getVal('idType'), idNum: getVal('idNum'), addressText: getVal('addressText'),
-        bankName: getVal('bankName'), bankBranch: getVal('bankBranch'),
-        bankType: getVal('bankType'), bankNum: getVal('bankNum'), bankHolder: getVal('bankHolder'),
+        kana: getRealVal('kana'),
+        birthday: getRealVal('birthday'),
+        idType: getRealVal('idType'),
+        idNum: getRealVal('idNum'),
+        addressText: getRealVal('addressText'),
+        bankName: getRealVal('bankName'),
+        bankBranch: getRealVal('bankBranch'),
+        bankType: getRealVal('bankType'),
+        bankNum: getRealVal('bankNum'),
+        bankHolder: getRealVal('bankHolder'),
         cancelIfSubMax: document.getElementById('cancelIfSubMax').checked ? "希望する" : "希望しない"
       }
     };
+
     try {
       const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
-      if((await res.json()).result === "SUCCESS") { alert("完了"); location.reload(); }
-    } catch(err) { alert("失敗"); btn.disabled = false; }
+      const resJson = await res.json();
+      if(resJson.result === "SUCCESS") {
+        alert("申し込みが完了しました。");
+        location.reload();
+      } else { throw new Error(); }
+    } catch(err) {
+      alert("送信に失敗しました。再度お試しください。");
+      btn.disabled = false;
+      btn.innerText = "規約に同意して査定を申し込む";
+    }
   };
 </script>
 </body>
