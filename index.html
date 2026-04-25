@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RAIRAI POS SYSTEM - FULL HISTORY</title>
+  <title>RAIRAI POS SYSTEM - PREMIUM v2</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <style>
@@ -133,7 +133,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbwi7tWn74PWL-HD59oj7p1DZDdfddMn4wdJRJCCZJKznuBSLZ6GA88W6Lp-g1RrFkkSOw/exec";
+  const GAS_URL = "ここに最新のGASデプロイURLを貼る";
   let cards = [], inputs = {}, activeCaseId = "default", cases = {}, currentFilter = "", waitingList = [];
   let isViewingLog = false;
   let tempLogMeta = {};
@@ -193,7 +193,7 @@
   }
 
   function calc() {
-    let tq = 0, ta = 0; Object.values(inputs).forEach(i => { tq += i.q; ta += (i.q * i.p); });
+    let tq = 0, ta = 0; Object.values(inputs).forEach(i => { tq += (i.q || 0); ta += ((i.q || 0) * (i.p || 0)); });
     document.getElementById('t-qty').innerText = tq;
     document.getElementById('t-amt').innerText = ta.toLocaleString();
   }
@@ -246,7 +246,7 @@
     Object.keys(cases).forEach(id => {
       const c = cases[id];
       let tq = 0, ta = 0;
-      Object.values(c.data || {}).forEach(i => { tq += i.q; ta += (i.q * i.p); });
+      Object.values(c.data || {}).forEach(i => { tq += (i.q || 0); ta += ((i.q || 0) * (i.p || 0)); });
       const b = document.createElement('div'); b.className = `case-badge ${id === activeCaseId ? 'active' : ''}`;
       b.onclick = () => loadCase(id); 
       b.innerHTML = `<div class="fw-bold text-truncate" style="max-width:110px;">${c.name}</div><div class="badge-meta">¥${ta.toLocaleString()} (${tq}枚)</div><i class="bi bi-x-circle-fill del-btn" onclick="deleteCase(event, '${id}')"></i>`;
@@ -257,30 +257,48 @@
   function deleteCase(e, id) { e.stopPropagation(); if(confirm("削除しますか？")){ delete cases[id]; if(activeCaseId===id) activeCaseId=Object.keys(cases)[0]; saveCurrentCase(); loadCase(activeCaseId || createNewCase()); } }
 
   function showReceipt() {
-    document.getElementById('main-ui').style.display='none'; document.getElementById('receipt').style.display='block';
-    const b = document.getElementById('r-body'); b.innerHTML = ""; let total = 0;
+    document.getElementById('main-ui').style.display='none'; 
+    document.getElementById('receipt').style.display='block';
+    const b = document.getElementById('r-body'); b.innerHTML = ""; 
+    let total = 0;
     document.getElementById('btn-finalize').style.display = isViewingLog ? 'none' : 'block';
     document.getElementById('receipt-back-btn').innerText = isViewingLog ? '履歴一覧に戻る' : '査定に戻る';
 
     Object.keys(inputs).forEach(key => {
-      const i = inputs[key]; const sub = i.q * i.p; total += sub;
-      b.innerHTML += `<tr><td><b>${i.n}</b><br><small>ランク:${i.t}</small></td><td class="text-center">¥${i.p.toLocaleString()}</td><td class="text-center"><div class="qty-ctrl has-value no-print" style="margin:auto;"><button class="qty-btn" onclick="changeQty('${i.n}','${i.t}',${p},-1)">-</button><input type="number" class="qty-num" value="${i.q}" onchange="updateQtyManually('${i.n}','${i.t}',${i.p},this.value)" ${isViewingLog ? 'disabled' : ''}><button class="qty-btn" onclick="changeQty('${i.n}','${i.t}',${i.p},1)">+</button></div><span class="print-only" style="font-weight:bold;">${i.q}</span></td><td class="text-end fw-bold">¥${sub.toLocaleString()}</td><td class="no-print text-center">${isViewingLog ? '' : `<button class="btn text-danger p-0" onclick="deleteRow('${key}')"><i class="bi bi-trash3-fill"></i></button>`}</td></tr>`;
+      const i = inputs[key]; 
+      if(!i) return;
+      const sub = (i.q || 0) * (i.p || 0); total += sub;
+      b.innerHTML += `<tr>
+        <td><b>${i.n}</b><br><small>ランク:${i.t}</small></td>
+        <td class="text-center">¥${(i.p || 0).toLocaleString()}</td>
+        <td class="text-center">
+          <div class="qty-ctrl has-value no-print" style="margin:auto;">
+            <button class="qty-btn" onclick="changeQty('${i.n}','${i.t}',${i.p},-1)">-</button>
+            <input type="number" class="qty-num" value="${i.q}" onchange="updateQtyManually('${i.n}','${i.t}',${i.p},this.value)" ${isViewingLog ? 'disabled' : ''}>
+            <button class="qty-btn" onclick="changeQty('${i.n}','${i.t}',${i.p},1)">+</button>
+          </div>
+          <span class="print-only" style="font-weight:bold;">${i.q}</span>
+        </td>
+        <td class="text-end fw-bold">¥${sub.toLocaleString()}</td>
+        <td class="no-print text-center">${isViewingLog ? '' : `<button class="btn text-danger p-0" onclick="deleteRow('${key}')"><i class="bi bi-trash3-fill"></i></button>`}</td>
+      </tr>`;
     });
     
-    const tq = Object.values(inputs).reduce((sum, item) => sum + item.q, 0);
+    const tq = Object.values(inputs).reduce((sum, item) => sum + (item.q || 0), 0);
     b.innerHTML += `<tr class="table-secondary"><td colspan="2" class="text-end fw-bold">合計査定額</td><td class="text-center fw-bold">${tq}</td><td class="text-end text-danger fw-bold h4">¥${total.toLocaleString()}</td><td class="no-print"></td></tr>`;
     
-    // ここが重要：履歴閲覧時(isViewingLog)でも、通常査定時でも、全てのメタ情報を表示
     const c = isViewingLog ? tempLogMeta : cases[activeCaseId];
-    document.getElementById('receipt-meta').innerHTML = `
-      <div class="row">
-        <div class="col-6">氏名: ${c.name} 様</div>
-        <div class="col-6 text-end">TEL: ${c.tel || '-'}</div>
-        <div class="col-12 mt-1">
-          振込先: ${c.bankName || '-'} ${c.bankBranch || ''} / ${c.bankNum || ''} / ${c.bankHolder || ''}
-        </div>
-        ${c.cancelIfSubMax === "希望する" ? "<div class='col-12 text-danger font-weight-bold'>【⚠️ 満額査定以外返送希望 ⚠️】</div>" : ""}
-      </div>`;
+    if(c){
+      document.getElementById('receipt-meta').innerHTML = `
+        <div class="row">
+          <div class="col-6">氏名: ${c.name || '-'} 様</div>
+          <div class="col-6 text-end">TEL: ${c.tel || '-'}</div>
+          <div class="col-12 mt-1">
+            振込先: ${c.bankName || '-'} ${c.bankBranch || ''} / ${c.bankNum || ''} / ${c.bankHolder || ''}
+          </div>
+          ${c.cancelIfSubMax === "希望する" ? "<div class='col-12 text-danger fw-bold'>【⚠️ 満額査定以外返送希望 ⚠️】</div>" : ""}
+        </div>`;
+    }
   }
 
   function hideReceipt() { document.getElementById('receipt').style.display='none'; document.getElementById('main-ui').style.display='block'; if(isViewingLog) { isViewingLog = false; loadCase(activeCaseId); switchMode('logs'); } else { draw(); } }
@@ -290,18 +308,7 @@
     if(!confirm("確定して保存しますか？")) return;
     const btn = document.getElementById('btn-finalize'); btn.disabled = true;
     const c = cases[activeCaseId];
-    const tradeData = { 
-      action: "log_trade", 
-      customerName: c.name, 
-      tel: c.tel || "", 
-      totalQty: document.getElementById('t-qty').innerText, 
-      totalAmount: document.getElementById('t-amt').innerText.replace(/,/g, ''), 
-      items: Object.values(inputs).filter(i => i.q > 0), 
-      bankName: c.bankName, 
-      bankBranch: c.bankBranch, 
-      bankNum: c.bankNum, 
-      bankHolder: c.bankHolder 
-    };
+    const tradeData = { action: "log_trade", customerName: c.name, tel: c.tel || "", totalQty: document.getElementById('t-qty').innerText, totalAmount: document.getElementById('t-amt').innerText.replace(/,/g, ''), items: Object.values(inputs).filter(i => i.q > 0), bankName: c.bankName, bankBranch: c.bankBranch, bankNum: c.bankNum, bankHolder: c.bankHolder };
     try { const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(tradeData) }); if((await res.json()).result === "SUCCESS") { alert("保存完了"); delete cases[activeCaseId]; localStorage.setItem('rairai_pos_v29', JSON.stringify(cases)); location.reload(); } } catch(e) { alert("失敗"); } finally { btn.disabled = false; }
   }
 
@@ -318,7 +325,7 @@
       if (!logs || logs.length === 0) { container.innerHTML = "履歴はありません。"; return; } 
       container.innerHTML = logs.map((l, index) => `
         <div class="bg-white p-2 rounded mb-2 border-start border-4 border-primary shadow-sm small">
-          <div class="d-flex justify-content-between"><b>${l.name} 様</b> <span class="text-danger fw-bold">¥${Number(l.totalAmount).toLocaleString()}</span></div>
+          <div class="d-flex justify-content-between"><b>${l.name} 様</b> <span class="text-danger fw-bold">¥${Number(l.totalAmount || 0).toLocaleString()}</span></div>
           <div class="text-secondary">${l.date} / ${l.totalQty}枚</div>
           <button class="btn btn-sm btn-dark mt-1" onclick='showLogDetail(${JSON.stringify(l)})'>明細を表示</button>
         </div>`).join(''); 
@@ -328,12 +335,12 @@
   function showLogDetail(logData) { 
     try { 
       isViewingLog = true; 
-      // ログデータには bankName などの振込先情報も含まれている前提です
       tempLogMeta = logData; 
       inputs = {}; 
-      JSON.parse(logData.items).forEach(i => { inputs[`${i.n}-${i.t}`] = i; }); 
+      const items = JSON.parse(logData.items || "[]");
+      items.forEach(i => { inputs[`${i.n}-${i.t}`] = i; }); 
       showReceipt(); 
-    } catch(e) { alert("失敗"); } 
+    } catch(e) { alert("明細データの解析に失敗しました。"); } 
   }
   
   async function refreshWaiting() { try { const res = await fetch(GAS_URL + "?action=getWaiting"); waitingList = await res.json(); const count = waitingList.length; const select = document.getElementById('waiting-select'); select.innerHTML = `<option value="">⏳ 待機中 (${count}件)</option>` + waitingList.map((c, i) => `<option value="${i}">${c.name} 様</option>`).join(''); select.style.border = count > 0 ? "2px solid #facc15" : "1px solid #cbd5e1"; } catch(e){} }
