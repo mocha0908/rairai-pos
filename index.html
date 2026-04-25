@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RAIRAI POS SYSTEM - PREMIUM</title>
+  <title>RAIRAI POS SYSTEM - COMPACT</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <style>
@@ -11,57 +11,64 @@
     body { background: var(--bg); color: #333; padding-bottom: 120px; font-family: sans-serif; }
     .sticky-top { background: #fff; border-bottom: 2px solid var(--main); padding: 10px 15px !important; z-index: 1020; }
     
-    /* ケースバッジの改良 */
+    /* ケースバッジ */
     .case-badge { 
-      display: inline-flex; 
-      flex-direction: column; 
-      gap: 2px; 
-      border: 1px solid #cbd5e1; 
-      padding: 6px 12px; 
-      border-radius: 8px; 
-      font-size: 0.75rem; 
-      background: white; 
-      cursor: pointer; 
-      min-width: 130px; 
-      margin-right: 8px;
-      position: relative;
-      transition: all 0.2s;
+      display: inline-flex; flex-direction: column; gap: 2px; border: 1px solid #cbd5e1; 
+      padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; background: white; 
+      cursor: pointer; min-width: 130px; margin-right: 8px; position: relative;
     }
-    .case-badge.active { background: var(--main); color: white; border-color: var(--main); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .case-badge.active { background: var(--main); color: white; border-color: var(--main); }
     .case-badge .badge-meta { font-size: 0.65rem; opacity: 0.8; }
     .case-badge .del-btn { position: absolute; top: 2px; right: 5px; color: #94a3b8; font-size: 1rem; }
-    .case-badge.active .del-btn { color: #fff; opacity: 0.7; }
+    .case-badge.active .del-btn { color: #fff; }
     
     .search-area { background: #fff; padding: 10px 15px; border-bottom: 1px solid #e2e8f0; }
-    
-    /* 顧客詳細パネル */
     .cust-detail-panel { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
-
     .filter-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 8px; }
     .filter-btn { padding: 6px 0; font-size: 0.75rem; font-weight: bold; border-radius: 4px; border: 1px solid #ddd; background: #fff; text-align: center; }
     .filter-btn.active { background: #64748b; color: white; }
     
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 15px; padding: 15px; }
-    .grid-item { background: white; border-radius: 12px; padding: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; min-height: 400px; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; padding: 10px; }
+    .grid-item { background: white; border-radius: 10px; padding: 10px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; min-height: 380px; }
     .grid-item.has-value { border: 2px solid var(--main); background: #fffbeb; }
-    .grid-img { width: 100%; height: 130px; object-fit: contain; margin-bottom: 10px; background: #f8fafc; }
+    .grid-img { width: 100%; height: 120px; object-fit: contain; margin-bottom: 5px; background: #f8fafc; }
     
     .qty-ctrl { display: inline-flex; align-items: center; border-radius: 4px; border: 1px solid #cbd5e1; overflow: hidden; background: #fff; }
     .qty-ctrl.has-value { background: var(--main); color: white; border-color: var(--main); }
-    .qty-btn { border: none; background: transparent; color: inherit; width: 26px; height: 28px; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-    .qty-num { width: 36px; border: none; text-align: center; background: transparent; font-weight: bold; font-size: 0.95rem; color: inherit; outline: none; }
+    .qty-btn { border: none; background: transparent; color: inherit; width: 24px; height: 26px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+    .qty-num { width: 32px; border: none; text-align: center; background: transparent; font-weight: bold; font-size: 0.9rem; color: inherit; outline: none; }
     
     .footer-bar { position: fixed; bottom: 0; width: 100%; background: var(--main); color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; z-index: 1050; }
-    .receipt-container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; }
-    .table-receipt { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1px solid #dee2e6; }
-    .table-receipt th, .table-receipt td { border: 1px solid #dee2e6; padding: 12px 15px; vertical-align: middle; }
+    .receipt-container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; }
+    .table-receipt { width: 100%; border-collapse: collapse; margin-top: 10px; border: 1px solid #dee2e6; }
+    .table-receipt th, .table-receipt td { border: 1px solid #dee2e6; padding: 10px 12px; vertical-align: middle; }
     .table-receipt th { background-color: #f8fafc; text-align: center; color: #64748b; font-size: 0.85rem; }
-    
-    .print-only { display: none !important; }
+
+    /* --- 印刷用設定（1ページに収めるための核心部分） --- */
     @media print {
+      @page { size: A4; margin: 8mm 5mm; }
+      body { background: #fff !important; color: #000 !important; font-size: 9pt; padding: 0 !important; }
       .no-print { display: none !important; }
       .print-only { display: inline !important; }
-      #receipt { display: block !important; }
+      #receipt { display: block !important; padding: 0 !important; }
+      .receipt-container { width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+      .receipt-title { font-size: 14pt !important; margin-bottom: 5px !important; }
+      #receipt-meta { padding: 8px !important; margin-bottom: 8px !important; border: 1px solid #000 !important; background: none !important; font-size: 9pt !important; line-height: 1.2; }
+      
+      .table-receipt { border: 1px solid #000 !important; table-layout: fixed; margin-top: 5px !important; }
+      .table-receipt th, .table-receipt td { 
+        border: 1px solid #000 !important; 
+        padding: 3px 6px !important; /* 余白を最小に */
+        font-size: 8.5pt !important; /* 文字を細く小さく */
+        line-height: 1.1 !important;
+      }
+      .table-receipt th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+      .table-secondary { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; }
+      .h4 { font-size: 11pt !important; font-weight: bold !important; margin: 0 !important; }
+      
+      /* ページ跨ぎを強制禁止 */
+      tr { page-break-inside: avoid !important; }
+      table { page-break-inside: auto !important; }
     }
   </style>
 </head>
@@ -70,7 +77,7 @@
 <div id="main-ui" class="no-print">
   <div class="sticky-top shadow-sm">
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <div class="fw-bold" style="color:var(--main);"><i class="bi bi-cpu"></i> RAIRAI POS</div>
+      <div class="fw-bold" style="color:var(--main);">RAIRAI POS</div>
       <div class="btn-group">
         <button id="btn-mode-main" class="btn btn-sm btn-outline-dark active" onclick="switchMode('main')">査定</button>
         <button id="btn-mode-logs" class="btn btn-sm btn-outline-dark" onclick="switchMode('logs')">履歴</button>
@@ -90,45 +97,20 @@
       <div id="cancel-banner" style="display:none; background:var(--danger); color:white; padding:8px; text-align:center; font-weight:bold; margin-bottom:10px; border-radius:6px;">【⚠️ 満額以外返送希望 ⚠️】</div>
       
       <div class="row g-2 mb-2 align-items-center">
-        <div class="col-6">
-          <input type="text" id="cust-name" class="form-control form-control-sm fw-bold" placeholder="顧客名" oninput="autoUpdateCaseName()">
-        </div>
+        <div class="col-6"><input type="text" id="cust-name" class="form-control form-control-sm fw-bold" placeholder="顧客名" oninput="autoUpdateCaseName()"></div>
         <div class="col-6 text-end">
-          <button class="btn btn-outline-secondary btn-sm w-100" type="button" data-bs-toggle="collapse" data-bs-target="#custDetails">
-            <i class="bi bi-person-vcard"></i> 顧客・振込先詳細
-          </button>
+          <button class="btn btn-outline-secondary btn-sm w-100" type="button" data-bs-toggle="collapse" data-bs-target="#custDetails">顧客・振込先詳細</button>
         </div>
       </div>
 
       <div class="collapse cust-detail-panel" id="custDetails">
-        <div class="row g-2">
-          <div class="col-6">
-            <label class="small text-secondary">電話番号</label>
-            <input type="text" id="cust-tel" class="form-control form-control-sm" placeholder="090..." oninput="saveCurrentCase()">
-          </div>
-          <div class="col-6">
-            <label class="small text-secondary">返送希望</label>
-            <select id="cancel-policy" class="form-select form-select-sm" onchange="updateCancelPolicy()">
-              <option value="希望しない">満額以外でも買取</option>
-              <option value="希望する">満額以外は返送</option>
-            </select>
-          </div>
-          <div class="col-4">
-            <label class="small text-secondary">銀行名</label>
-            <input type="text" id="bank-name" class="form-control form-control-sm" oninput="saveCurrentCase()">
-          </div>
-          <div class="col-4">
-            <label class="small text-secondary">支店名</label>
-            <input type="text" id="bank-branch" class="form-control form-control-sm" oninput="saveCurrentCase()">
-          </div>
-          <div class="col-4">
-            <label class="small text-secondary">口座番号</label>
-            <input type="text" id="bank-num" class="form-control form-control-sm" oninput="saveCurrentCase()">
-          </div>
-          <div class="col-12">
-            <label class="small text-secondary">口座名義（カナ）</label>
-            <input type="text" id="bank-holder" class="form-control form-control-sm" oninput="saveCurrentCase()">
-          </div>
+        <div class="row g-2 small">
+          <div class="col-6"><label>電話番号</label><input type="text" id="cust-tel" class="form-control form-control-sm" oninput="saveCurrentCase()"></div>
+          <div class="col-6"><label>返送希望</label><select id="cancel-policy" class="form-select form-select-sm" onchange="updateCancelPolicy()"><option value="希望しない">満額以外でも買取</option><option value="希望する">満額以外は返送</option></select></div>
+          <div class="col-4"><label>銀行名</label><input type="text" id="bank-name" class="form-control form-control-sm" oninput="saveCurrentCase()"></div>
+          <div class="col-4"><label>支店名</label><input type="text" id="bank-branch" class="form-control form-control-sm" oninput="saveCurrentCase()"></div>
+          <div class="col-4"><label>口座番号</label><input type="text" id="bank-num" class="form-control form-control-sm" oninput="saveCurrentCase()"></div>
+          <div class="col-12"><label>口座名義（カナ）</label><input type="text" id="bank-holder" class="form-control form-control-sm" oninput="saveCurrentCase()"></div>
         </div>
       </div>
 
@@ -141,44 +123,36 @@
     <div id="display-container" class="card-grid"></div>
   </div>
 
-  <div id="履歴モード" style="display:none; padding:10px;">
-    <h5 class="fw-bold mb-3">最近の買取履歴</h5>
-    <div id="logs-container"></div>
-  </div>
+  <div id="履歴モード" style="display:none; padding:10px;"><h5 class="fw-bold mb-3">最近の買取履歴</h5><div id="logs-container"></div></div>
 </div>
 
-<div id="receipt" style="display:none; background:white; min-height: 100vh;">
+<div id="receipt" style="display:none; background:white;">
   <div class="receipt-container">
-    <div class="text-center">
-      <h3 class="fw-bold receipt-title">買取査定明細書</h3>
-    </div>
-    <div id="receipt-meta" class="mb-3 mt-1 p-3 bg-light border rounded fw-bold"></div>
+    <div class="text-center"><h3 class="fw-bold receipt-title">買取査定明細書</h3></div>
+    <div id="receipt-meta" class="mb-2 mt-1 p-2 bg-light border rounded fw-bold"></div>
     <table class="table-receipt">
       <thead>
         <tr>
-          <th style="width: 45%; text-align: left;">商品名 / ランク</th>
+          <th style="width: 50%; text-align: left;">商品名 / ランク</th>
           <th style="width: 15%; text-align: center;">単価</th>
-          <th style="width: 20%; text-align: center;">数量</th>
+          <th style="width: 15%; text-align: center;">数量</th>
           <th style="width: 20%; text-align: right;">小計</th>
-          <th class="no-print" style="width: 5%;"></th>
+          <th class="no-print" style="width: 40px;"></th>
         </tr>
       </thead>
       <tbody id="r-body"></tbody>
     </table>
-    <div class="mt-5 d-flex flex-column gap-3 no-print">
-      <button class="btn btn-success btn-lg fw-bold shadow" onclick="window.print()"><i class="bi bi-printer"></i> 印刷・PDF保存</button>
-      <button class="btn btn-primary btn-lg fw-bold shadow" id="btn-finalize" onclick="finalizeTrade()"><i class="bi bi-cloud-upload"></i> 買取確定・保存</button>
-      <button id="receipt-back-btn" class="btn btn-outline-secondary py-3 fw-bold" onclick="hideReceipt()">査定に戻る</button>
+    <div class="mt-4 d-flex flex-column gap-2 no-print">
+      <button class="btn btn-success btn-lg fw-bold" onclick="window.print()">印刷・PDF保存</button>
+      <button class="btn btn-primary btn-lg fw-bold" id="btn-finalize" onclick="finalizeTrade()">買取確定・保存</button>
+      <button id="receipt-back-btn" class="btn btn-outline-secondary py-2" onclick="hideReceipt()">査定に戻る</button>
     </div>
   </div>
 </div>
 
 <div class="footer-bar no-print">
   <div class="h3 m-0 fw-bold">¥<span id="t-amt">0</span> <small class="fs-6 opacity-75 ms-2"><span id="t-qty">0</span> 枚</small></div>
-  <div class="d-flex gap-2">
-    <button class="btn btn-success btn-sm px-3 fw-bold" onclick="saveTemp()">一時保存</button>
-    <button class="btn btn-outline-warning btn-sm px-4 rounded-pill fw-bold" onclick="resetAll()">全リセット</button>
-  </div>
+  <div class="d-flex gap-2"><button class="btn btn-success btn-sm px-3 fw-bold" onclick="saveTemp()">一時保存</button><button class="btn btn-outline-warning btn-sm px-4 rounded-pill fw-bold" onclick="resetAll()">全リセット</button></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -238,7 +212,7 @@
         return `<tr><td style="width:20px; font-weight:900">${t}</td><td class="text-danger fw-bold">¥${p.toLocaleString()}</td><td class="text-end"><div class="qty-ctrl ${q>0?'has-value':''}"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${p},-1)">-</button><input type="number" class="qty-num" value="${q||''}" onchange="updateQtyManually('${c.name}','${t}',${p},this.value)" placeholder="0"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${p},1)">+</button></div></td></tr>`;
       }).join('');
       const hasV = ['S','A','B','C','D'].some(t => inputs[c.name+'-'+t]?.q > 0);
-      return `<div class="grid-item ${hasV?'has-value':''}"><img src="${c.image}" class="grid-img"><div style="font-size:0.75rem; font-weight:bold; height:3em;">${c.name}</div><table style="width:100%; font-size:0.75rem;">${rows}</table></div>`;
+      return `<div class="grid-item ${hasV?'has-value':''}"><img src="${c.image}" class="grid-img"><div style="font-size:0.75rem; font-weight:bold; height:3em;">${c.name}</div><table style="width:100%; font-size:0.7rem;">${rows}</table></div>`;
     }).join('');
   }
 
@@ -250,14 +224,15 @@
 
   function saveCurrentCase() {
     if(!cases[activeCaseId]) return;
-    cases[activeCaseId].name = document.getElementById('cust-name').value || "新規";
-    cases[activeCaseId].tel = document.getElementById('cust-tel').value || "";
-    cases[activeCaseId].bankName = document.getElementById('bank-name').value || "";
-    cases[activeCaseId].bankBranch = document.getElementById('bank-branch').value || "";
-    cases[activeCaseId].bankNum = document.getElementById('bank-num').value || "";
-    cases[activeCaseId].bankHolder = document.getElementById('bank-holder').value || "";
-    cases[activeCaseId].cancelIfSubMax = document.getElementById('cancel-policy').value || "希望しない";
-    cases[activeCaseId].data = JSON.parse(JSON.stringify(inputs));
+    const c = cases[activeCaseId];
+    c.name = document.getElementById('cust-name').value || "新規";
+    c.tel = document.getElementById('cust-tel').value || "";
+    c.bankName = document.getElementById('bank-name').value || "";
+    c.bankBranch = document.getElementById('bank-branch').value || "";
+    c.bankNum = document.getElementById('bank-num').value || "";
+    c.bankHolder = document.getElementById('bank-holder').value || "";
+    c.cancelIfSubMax = document.getElementById('cancel-policy').value || "希望しない";
+    c.data = JSON.parse(JSON.stringify(inputs));
     localStorage.setItem('rairai_pos_v29', JSON.stringify(cases));
     localStorage.setItem('rairai_pos_active_id', activeCaseId);
     updateCaseListUI();
@@ -296,14 +271,9 @@
       const c = cases[id];
       let tq = 0, ta = 0;
       Object.values(c.data || {}).forEach(i => { tq += i.q; ta += (i.q * i.p); });
-      
-      const b = document.createElement('div'); 
-      b.className = `case-badge ${id === activeCaseId ? 'active' : ''}`;
+      const b = document.createElement('div'); b.className = `case-badge ${id === activeCaseId ? 'active' : ''}`;
       b.onclick = () => loadCase(id); 
-      b.innerHTML = `
-        <div class="fw-bold text-truncate" style="max-width:110px;">${c.name}</div>
-        <div class="badge-meta">¥${ta.toLocaleString()} (${tq}枚)</div>
-        <i class="bi bi-x-circle-fill del-btn" onclick="deleteCase(event, '${id}')"></i>`;
+      b.innerHTML = `<div class="fw-bold text-truncate" style="max-width:110px;">${c.name}</div><div class="badge-meta">¥${ta.toLocaleString()} (${tq}枚)</div><i class="bi bi-x-circle-fill del-btn" onclick="deleteCase(event, '${id}')"></i>`;
       area.appendChild(b);
     });
   }
@@ -314,9 +284,8 @@
     document.getElementById('main-ui').style.display='none'; document.getElementById('receipt').style.display='block';
     const b = document.getElementById('r-body'); b.innerHTML = ""; let total = 0;
     document.getElementById('btn-finalize').style.display = isViewingLog ? 'none' : 'block';
-    document.getElementById('receipt-back-btn').innerText = isViewingLog ? '履歴一覧に戻る' : '査定に戻る';
-
-    Object.keys(inputs).forEach(key => {
+    const items = Object.keys(inputs);
+    items.forEach(key => {
       const i = inputs[key]; const sub = i.q * i.p; total += sub;
       b.innerHTML += `<tr>
         <td><b>${i.n}</b><br><small>ランク:${i.t}</small></td>
@@ -330,100 +299,39 @@
           <span class="print-only" style="font-weight:bold;">${i.q}</span>
         </td>
         <td class="text-end fw-bold">¥${sub.toLocaleString()}</td>
-        <td class="no-print text-center">
-            ${isViewingLog ? '' : `<button class="btn text-danger p-0" onclick="deleteRow('${key}')"><i class="bi bi-trash3-fill"></i></button>`}
-        </td>
+        <td class="no-print text-center">${isViewingLog ? '' : `<button class="btn text-danger p-0" onclick="deleteRow('${key}')"><i class="bi bi-trash3-fill"></i></button>`}</td>
       </tr>`;
     });
-    
     const tq = Object.values(inputs).reduce((sum, item) => sum + item.q, 0);
     b.innerHTML += `<tr class="table-secondary"><td colspan="2" class="text-end fw-bold">合計査定額</td><td class="text-center fw-bold">${tq}</td><td class="text-end text-danger fw-bold h4">¥${total.toLocaleString()}</td><td class="no-print"></td></tr>`;
-    
     const c = isViewingLog ? tempLogMeta : cases[activeCaseId];
-    document.getElementById('receipt-meta').innerHTML = `
-      <div class="row">
-        <div class="col-6">氏名: ${c.name} 様</div>
-        <div class="col-6 text-end small">TEL: ${c.tel || '-'}</div>
-        <div class="col-12 mt-2">振込先: ${c.bankName||'-'} ${c.bankBranch||''} / ${c.bankNum||''} / ${c.bankHolder||''}</div>
-        ${c.cancelIfSubMax === "希望する" ? "<div class='col-12 mt-1 text-danger'>【！！満額査定以外返送希望！！】</div>" : ""}
-      </div>`;
+    document.getElementById('receipt-meta').innerHTML = `<div class="row"><div class="col-6">氏名: ${c.name} 様</div><div class="col-6 text-end">TEL: ${c.tel || '-'}</div><div class="col-12 mt-1">振込先: ${c.bankName||'-'} ${c.bankBranch||''} / ${c.bankNum||''} / ${c.bankHolder||''}</div>${c.cancelIfSubMax === "希望する" ? "<div class='col-12 text-danger'>【！！満額査定以外返送希望！！】</div>" : ""}</div>`;
   }
 
-  function hideReceipt() {
-    document.getElementById('receipt').style.display='none';
-    document.getElementById('main-ui').style.display='block';
-    if(isViewingLog) { isViewingLog = false; loadCase(activeCaseId); switchMode('logs'); } else { draw(); }
-  }
-
+  function hideReceipt() { document.getElementById('receipt').style.display='none'; document.getElementById('main-ui').style.display='block'; if(isViewingLog) { isViewingLog = false; loadCase(activeCaseId); switchMode('logs'); } else { draw(); } }
   function deleteRow(key) { if(isViewingLog) return; delete inputs[key]; saveCurrentCase(); calc(); showReceipt(); }
 
   async function finalizeTrade() {
     if(!confirm("確定して保存しますか？")) return;
     const btn = document.getElementById('btn-finalize'); btn.disabled = true;
     const c = cases[activeCaseId];
-    const tradeData = { 
-      action: "log_trade", customerName: c.name, tel: c.tel || "", 
-      totalQty: document.getElementById('t-qty').innerText, totalAmount: document.getElementById('t-amt').innerText.replace(/,/g, ''),
-      items: Object.values(inputs).filter(i => i.q > 0),
-      bankName: c.bankName, bankBranch: c.bankBranch, bankNum: c.bankNum, bankHolder: c.bankHolder
-    };
-    try {
-      const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(tradeData) });
-      if((await res.json()).result === "SUCCESS") { alert("保存完了"); delete cases[activeCaseId]; localStorage.setItem('rairai_pos_v29', JSON.stringify(cases)); location.reload(); }
-    } catch(e) { alert("失敗"); } finally { btn.disabled = false; }
+    const tradeData = { action: "log_trade", customerName: c.name, tel: c.tel || "", totalQty: document.getElementById('t-qty').innerText, totalAmount: document.getElementById('t-amt').innerText.replace(/,/g, ''), items: Object.values(inputs).filter(i => i.q > 0), bankName: c.bankName, bankBranch: c.bankBranch, bankNum: c.bankNum, bankHolder: c.bankHolder };
+    try { const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(tradeData) }); if((await res.json()).result === "SUCCESS") { alert("保存完了"); delete cases[activeCaseId]; localStorage.setItem('rairai_pos_v29', JSON.stringify(cases)); location.reload(); } } catch(e) { alert("失敗"); } finally { btn.disabled = false; }
   }
 
   async function saveTemp() {
     const c = cases[activeCaseId]; if(!c.name || c.name === "新規") return alert("名前を入力してください");
-    try {
-      await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "save_temp", customerName: c.name, tel: c.tel, items: inputs, totalQty: document.getElementById('t-qty').innerText, totalAmount: document.getElementById('t-amt').innerText, bankName: c.bankName, bankBranch: c.bankBranch, bankNum: c.bankNum, bankHolder: c.bankHolder }) });
-      alert("一時保存しました");
-    } catch(e) { alert("失敗"); }
+    try { await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "save_temp", customerName: c.name, tel: c.tel, items: inputs, totalQty: document.getElementById('t-qty').innerText, totalAmount: document.getElementById('t-amt').innerText, bankName: c.bankName, bankBranch: c.bankBranch, bankNum: c.bankNum, bankHolder: c.bankHolder }) }); alert("一時保存しました"); } catch(e) { alert("失敗"); }
   }
 
   async function loadTradeLogs() {
     const container = document.getElementById('logs-container'); container.innerHTML = "読み込み中...";
-    try {
-      const res = await fetch(GAS_URL + "?action=getTradeLogs");
-      const logs = await res.json();
-      if (!logs || logs.length === 0) { container.innerHTML = "履歴はありません。"; return; }
-      container.innerHTML = logs.map((l, index) => `<div class="log-item bg-white p-3 rounded mb-2 border-start border-4 border-primary shadow-sm">
-          <div class="d-flex justify-content-between"><b>${l.name} 様</b> <span class="text-danger fw-bold">¥${Number(l.totalAmount).toLocaleString()}</span></div>
-          <div class="small text-secondary">${l.date} / ${l.totalQty}枚</div>
-          <button class="btn btn-sm btn-dark mt-2" onclick='showLogDetail(${JSON.stringify(l)})'>明細を表示</button>
-        </div>`).join('');
-    } catch(e) { container.innerHTML = "取得失敗。"; }
+    try { const res = await fetch(GAS_URL + "?action=getTradeLogs"); const logs = await res.json(); if (!logs || logs.length === 0) { container.innerHTML = "履歴はありません。"; return; } container.innerHTML = logs.map((l, index) => `<div class="bg-white p-2 rounded mb-2 border-start border-4 border-primary shadow-sm small"><div class="d-flex justify-content-between"><b>${l.name} 様</b> <span class="text-danger fw-bold">¥${Number(l.totalAmount).toLocaleString()}</span></div><div>${l.date} / ${l.totalQty}枚</div><button class="btn btn-sm btn-dark mt-1" onclick='showLogDetail(${JSON.stringify(l)})'>明細を表示</button></div>`).join(''); } catch(e) { container.innerHTML = "取得失敗。"; }
   }
 
-  function showLogDetail(logData) {
-    try {
-      isViewingLog = true;
-      tempLogMeta = logData;
-      inputs = {};
-      JSON.parse(logData.items).forEach(i => { inputs[`${i.n}-${i.t}`] = i; });
-      showReceipt();
-    } catch(e) { alert("失敗"); }
-  }
-
-  async function refreshWaiting() {
-    try {
-      const res = await fetch(GAS_URL + "?action=getWaiting");
-      waitingList = await res.json();
-      const select = document.getElementById('waiting-select');
-      select.innerHTML = `<option value="">⏳ 待機中</option>` + waitingList.map((c, i) => `<option value="${i}">${c.name} 様</option>`).join('');
-    } catch(e){}
-  }
-
-  async function handleWaitingSelect(selectObj) {
-    const idx = selectObj.value; if(idx === "") return;
-    const c = waitingList[idx]; if(!confirm(`${c.name} 様の査定を開始しますか？`)) { selectObj.value = ""; return; }
-    const id = "c_" + Date.now();
-    cases[id] = { name: c.name, tel: c.tel || "", cancelIfSubMax: c.cancelStatus || "希望しない", bankName: c.bankName||"", bankBranch: c.bankBranch||"", bankNum: c.bankNum||"", bankHolder: c.bankHolder||"", data: {} };
-    saveCurrentCase(); loadCase(id);
-    await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "update_status", customerName: c.name, newStatus: "査定中" }) });
-    refreshWaiting(); selectObj.value = "";
-  }
-
+  function showLogDetail(logData) { try { isViewingLog = true; tempLogMeta = logData; inputs = {}; JSON.parse(logData.items).forEach(i => { inputs[`${i.n}-${i.t}`] = i; }); showReceipt(); } catch(e) { alert("失敗"); } }
+  async function refreshWaiting() { try { const res = await fetch(GAS_URL + "?action=getWaiting"); waitingList = await res.json(); const select = document.getElementById('waiting-select'); select.innerHTML = `<option value="">⏳ 待機中</option>` + waitingList.map((c, i) => `<option value="${i}">${c.name} 様</option>`).join(''); } catch(e){} }
+  async function handleWaitingSelect(selectObj) { const idx = selectObj.value; if(idx === "") return; const c = waitingList[idx]; if(!confirm(`${c.name} 様の査定を開始しますか？`)) { selectObj.value = ""; return; } const id = "c_" + Date.now(); cases[id] = { name: c.name, tel: c.tel || "", cancelIfSubMax: c.cancelStatus || "希望しない", bankName: c.bankName||"", bankBranch: c.bankBranch||"", bankNum: c.bankNum||"", bankHolder: c.bankHolder||"", data: {} }; saveCurrentCase(); loadCase(id); await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "update_status", customerName: c.name, newStatus: "査定中" }) }); refreshWaiting(); selectObj.value = ""; }
   function resetAll() { if(confirm('全リセットしますか？')) { localStorage.clear(); location.reload(); } }
 </script>
 </body>
