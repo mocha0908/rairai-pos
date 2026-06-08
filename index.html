@@ -133,46 +133,43 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // ここにGASのデプロイURLを貼ってください
   const GAS_URL = "https://script.google.com/macros/s/AKfycbwi7tWn74PWL-HD59oj7p1DZDdfddMn4wdJRJCCZJKznuBSLZ6GA88W6Lp-g1RrFkkSOw/exec"; 
+  
+  // ★ GitHubのRawURLへ差し替え完了。これで表示速度が劇的に向上します。
+  const DATA_JSON_URL = "https://raw.githubusercontent.com/mocha0908/rairai-pos-data/main/data.json";
   
   let cards = [], inputs = {}, activeCaseId = "default", cases = {}, currentFilter = "", currentRarity = "", waitingList = [];
   let isViewingLog = false;
   let tempLogMeta = {};
 
-  // 五十音フィルター定義
   const filterMap = {"あ":"^[あいうえおアイウエオ]","か":"^[かきくけこがぎぐげご]","さ":"^[さしすせそざじずぜぞ]","た":"^[たちつてとだぢづでど]","な":"^[なにぬねの]","は":"^[はひふへほばびぶべぼぱぴぷぺぽ]","ま":"^[まみむめも]","や":"^[やゆよ]","ら":"^[らりるれろ]","わ":"^[わをん]"};
 
   window.onload = async () => {
-    // 1. まずローカルストレージ等の復元とGASからのカードデータ読込を並行して行う
     const saved = localStorage.getItem('rairai_pos_v29');
     if (saved) { cases = JSON.parse(saved); activeCaseId = localStorage.getItem('rairai_pos_active_id') || Object.keys(cases)[0]; } else { createNewCase(); }
     
     try { 
-      const res = await fetch(GAS_URL); 
+      const res = await fetch(DATA_JSON_URL); 
       cards = await res.json(); 
       
-      // データ読込完了後に、実際の【】からレアリティボタンを自動生成する
       createRarityButtons();
       createKanaButtons();
       
       draw(); 
       loadCase(activeCaseId); 
     } catch(e) {
-      // 通信失敗時でも最低限五十音ボタンだけは出す
+      console.error("GitHubからのデータ取得失敗。フォールバックを行います。", e);
       createKanaButtons();
     }
     
     setInterval(refreshWaiting, 15000); refreshWaiting();
   };
 
-  // --- 【新規追加】商品名から【】の中身を自動抽出してボタンを作る処理 ---
   function createRarityButtons() {
     const filterContainer = document.getElementById('filter-btns');
     const rarityDiv = document.createElement('div');
     rarityDiv.style.cssText = "display: flex; gap: 4px; overflow-x: auto; pb: 2px;";
     
-    // 全レア度ボタン
     const rAll = document.createElement('button');
     rAll.className = "filter-btn active"; rAll.innerText = "全レア度"; rAll.style.padding = "4px 10px"; rAll.style.minWidth = "70px";
     rAll.onclick = function() {
@@ -181,41 +178,31 @@
     };
     rarityDiv.appendChild(rAll);
 
-    // カードデータから【】の中身を正規表現で全抽出
     const foundRarities = new Set();
     cards.forEach(c => {
       if (c.name) {
-        // 文字列内のすべての 【 】 を探す
         const matches = c.name.match(/【(.*?)】/g);
-        if (matches) {
-          matches.forEach(m => foundRarities.add(m)); // 「【SR】」のような形で保存される
-        }
+        if (matches) { matches.forEach(m => foundRarities.add(m)); }
       }
     });
 
-    // 抽出したレアリティをソートしてボタン化
     Array.from(foundRarities).sort().forEach(fullTag => {
-      // ボタン表示用は、カッコを外した文字にする（例：【SR】→ SR）
       const displayName = fullTag.replace(/【|】/g, '');
-      
       const b = document.createElement('button'); 
       b.className = "filter-btn"; 
       b.innerText = displayName; 
       b.style.padding = "4px 10px"; 
       b.style.minWidth = "60px";
-      
       b.onclick = function() {
         rarityDiv.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active')); this.classList.add('active');
-        currentRarity = fullTag; // フィルタリングには「【SR】」を用いる
+        currentRarity = fullTag;
         draw();
       };
       rarityDiv.appendChild(b);
     });
-    
     filterContainer.appendChild(rarityDiv);
   }
 
-  // 五十音ボタンの生成処理を分離
   function createKanaButtons() {
     const filterContainer = document.getElementById('filter-btns');
     const kanaDiv = document.createElement('div');
@@ -266,7 +253,6 @@
     if (document.getElementById('receipt').style.display === 'block') showReceipt(); else draw();
   }
 
-  // 絞り込み描画ロジック
   function draw() {
     const container = document.getElementById('display-container');
     const sw = document.getElementById('search').value.toLowerCase();
@@ -275,10 +261,7 @@
       if (c.isFixed) return true;
       const matchesSearch = c.name.toLowerCase().includes(sw);
       const matchesKana = currentFilter === "" || new RegExp(currentFilter).test(c.name);
-      
-      // 自動抽出された【レアリティ】が含まれているかのチェック
       const matchesRarity = currentRarity === "" || c.name.includes(currentRarity);
-      
       return matchesSearch && matchesKana && matchesRarity;
     });
 
@@ -356,7 +339,6 @@
 
   function deleteCase(e, id) { e.stopPropagation(); if(confirm("削除しますか？")){ delete cases[id]; if(activeCaseId===id) activeCaseId=Object.keys(cases)[0]; saveCurrentCase(); loadCase(activeCaseId || createNewCase()); } }
 
-  // 明細表示
   function showReceipt() {
     document.getElementById('main-ui').style.display='none'; 
     document.getElementById('receipt').style.display='block';
