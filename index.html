@@ -43,7 +43,6 @@
     .table-receipt th, .table-receipt td { border: 1px solid #dee2e6; padding: 10px 12px; vertical-align: middle; }
     .table-receipt th { background-color: #f8fafc; text-align: center; color: #64748b; font-size: 0.85rem; }
 
-    /* ページネーション用カスタムスタイル */
     .pagination-area { display: flex; justify-content: center; align-items: center; gap: 4px; margin-top: 10px; flex-wrap: wrap; }
     .page-link-btn { padding: 4px 10px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; border: 1px solid #cbd5e1; background: #fff; color: #333; cursor: pointer; }
     .page-link-btn.active { background: var(--main); color: #fff; border-color: var(--main); }
@@ -110,13 +109,11 @@
       </div>
       <div id="filter-btns" class="filter-grid"></div>
       
-      <!-- ★上部ページネーション表示ボタンエリア -->
       <div id="pagination-container" class="pagination-area"></div>
     </div>
     
     <div id="display-container" class="card-grid"></div>
     
-    <!-- ★下部ページネーション表示ボタンエリア -->
     <div id="pagination-container-bottom" class="pagination-area" style="margin-top: 15px; margin-bottom: 15px;"></div>
   </div>
 
@@ -153,11 +150,9 @@
   let isViewingLog = false;
   let tempLogMeta = {};
 
-  // ★ページネーション用のグローバル変数
   let currentPage = 1;
-  const itemsPerPage = 20; // 1ページあたり20枚固定
+  const itemsPerPage = 20; 
 
-  // 💡ひらがな・カタカナ両対応版に修正
   const filterMap = {
     "あ": "^[あいうえおアイウエオ]",
     "か": "^[かきくけこがぎぐげごカキクケコガギグゲゴ]",
@@ -285,55 +280,51 @@
     if (document.getElementById('receipt').style.display === 'block') showReceipt(); else draw();
   }
 
-  // ★「1ページ20件ずつ」に完全対応した爆速レンダリング
   function draw() {
     const container = document.getElementById('display-container');
     const pageContainer = document.getElementById('pagination-container');
-    // 💡下部ページネーション用のエリアを取得
     const pageContainerBottom = document.getElementById('pagination-container-bottom');
     const sw = document.getElementById('search').value.toLowerCase().trim();
     
-    // 1. まず条件（検索・フィルター）に合うカードを全抽出
     const filtered = cards.filter(c => {
       if (c.isFixed) return true;
-      
-      // 💡安全ガード：データ不備によるクラッシュ防止
       if (!c.name) return false;
 
-      // 💡先頭の【レア度】を取り除いた、純粋なカード名を作る
       const pureName = c.name.replace(/^【.*?】/, '').trim();
-
       const matchesSearch = sw === "" || c.name.toLowerCase().includes(sw);
-      // 💡c.name ではなく、pureName に対して50音判定を行う（カタカナもヒットする）
       const matchesKana = currentFilter === "" || new RegExp(currentFilter).test(pureName);
       const matchesRarity = currentRarity === "" || c.name.includes(currentRarity);
       return matchesSearch && matchesKana && matchesRarity;
     });
 
-    // 2. ページ数を計算
     const totalItems = filtered.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
     
-    // ページ範囲外に飛ばないように安全ガード
     if (currentPage > totalPages) currentPage = totalPages;
     if (currentPage < 1) currentPage = 1;
 
-    // 3. 今のページに対応する20件だけを切り出す
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const sliced = filtered.slice(startIndex, endIndex);
 
-    // 4. カードのHTMLを出力
     container.innerHTML = sliced.map(c => {
       const rows = ['S','A','B','C','D'].map(t => {
         const q = inputs[c.name+'-'+t]?.q || 0; const p = c['price'+t] || 0;
         return `<tr><td style="width:20px; font-weight:900">${t}</td><td class="text-danger fw-bold">¥${p.toLocaleString()}</td><td class="text-end"><div class="qty-ctrl ${q>0?'has-value':''}"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${p},-1)">-</button><input type="number" class="qty-num" value="${q||''}" onchange="updateQtyManually('${c.name}','${t}',${p},this.value)" placeholder="0"><button class="qty-btn" onclick="changeQty('${c.name}','${t}',${p},1)">+</button></div></td></tr>`;
       }).join('');
       const hasV = ['S','A','B','C','D'].some(t => inputs[c.name+'-'+t]?.q > 0);
-      return `<div class="grid-item ${hasV?'has-value':''}"><img src="${c.image}" class="grid-img"><div style="font-size:0.75rem; font-weight:bold; height:3em;">${c.name}</div><table style="width:100%; font-size:0.7rem;">${rows}</table></div>`;
+      
+      // ★ H列ヘッダー名が何であってもURLを追跡する処理
+      let rawImgUrl = c.image || c.画像 || c.画像URL || c.URL || c.url || "";
+      let finalImgUrl = rawImgUrl.trim();
+      
+      if (finalImgUrl && !finalImgUrl.startsWith("http")) {
+        finalImgUrl = "https://raw.githubusercontent.com/mocha0908/rairai-pos-data/main/" + finalImgUrl.replace(/^\.\//, "");
+      }
+
+      return `<div class="grid-item ${hasV?'has-value':''}"><img src="${finalImgUrl}" class="grid-img" onerror="this.src='https://placehold.co/120x120?text=No+Image'"><div style="font-size:0.75rem; font-weight:bold; height:3em;">${c.name}</div><table style="width:100%; font-size:0.7rem;">${rows}</table></div>`;
     }).join('');
 
-    // 5. ページ切り替え用ボタン（UI）の自動生成
     let pageHtml = `<button class="page-link-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">前へ</button>`;
     
     let startPage = Math.max(1, currentPage - 2);
@@ -347,11 +338,11 @@
     pageHtml += `<button class="page-link-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">次へ</button>`;
     pageHtml += `<span class="ms-2 small text-secondary">${totalItems}件中 ${startIndex + 1}〜${Math.min(endIndex, totalItems)}件表示</span>`;
     
-    // 💡上部と下部、両方のコンテナに同じボタンHTMLを流し込む
     pageContainer.innerHTML = pageHtml;
     if (pageContainerBottom) pageContainerBottom.innerHTML = pageHtml;
   }
 
+  // (以下、ロジック部分は変更ありません)
   function changePage(pageNumber) {
     currentPage = pageNumber;
     draw();
