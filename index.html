@@ -2312,9 +2312,12 @@
           return tokens.every(variants => variants.some(token => haystack.includes(token)));
         })
         .sort((a, b) => {
-          const aSelected = selectedNames.has(a.name) ? 1 : 0;
-          const bSelected = selectedNames.has(b.name) ? 1 : 0;
-          return bSelected - aSelected || a._index - b._index;
+          const nameOrder = String(a.name || "").localeCompare(
+            String(b.name || ""),
+            "ja",
+            { numeric: true, sensitivity: "base" }
+          );
+          return nameOrder || a._index - b._index;
         });
     }
 
