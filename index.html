@@ -815,7 +815,7 @@
     .rank-control-cell { text-align: right; }
     .qty-ctrl {
       display: inline-grid;
-      grid-template-columns: 28px 38px 28px;
+      grid-template-columns: 28px 54px 28px;
       align-items: center;
       overflow: hidden;
       border: 1px solid var(--line-strong);
@@ -845,7 +845,7 @@
     .qty-btn:hover { background: rgba(17, 25, 77, .07); }
     .qty-ctrl.has-value .qty-btn:hover { background: rgba(255, 255, 255, .13); }
     .qty-num {
-      width: 38px;
+      width: 54px;
       height: 29px;
       border: 0;
       border-inline: 1px solid var(--line);
@@ -1365,9 +1365,9 @@
       .product-name { font-size: .7rem; }
       .rank-table { font-size: .66rem; }
       .rank-label { width: 18px; font-size: .64rem; }
-      .qty-ctrl { grid-template-columns: 25px 34px 25px; }
+      .qty-ctrl { grid-template-columns: 25px 48px 25px; }
       .qty-btn { width: 25px; height: 28px; }
-      .qty-num { width: 34px; height: 28px; }
+      .qty-num { width: 48px; height: 28px; }
       .list-view .product-card { grid-template-columns: 86px minmax(0, 1fr); min-height: 136px; }
       .list-view .product-image-wrap { min-height: 136px; }
       .list-view .product-body { display: block; padding: 8px 9px; }
@@ -1785,6 +1785,7 @@
     const LOCAL_UPDATED_KEY = "rairai_pos_local_updated_at";
     const SERVER_BACKUP_SCOPE = "rairai-pos-shared";
     const DATA_REFRESH_INTERVAL = 5 * 60 * 1000;
+    const MAX_QUANTITY = 99999;
 
     let cards = [];
     let inputs = {};
@@ -2374,7 +2375,7 @@
             <td class="rank-control-cell">
               <div class="qty-ctrl ${quantity > 0 ? "has-value" : ""}">
                 <button class="qty-btn" type="button" data-qty-action="decrease" data-card-index="${card._index}" data-rank="${rank}" data-price="${price}" aria-label="${escapeHtml(card.name)} ランク${rank}を1枚減らす">−</button>
-                <input class="qty-num" type="number" min="0" max="999" inputmode="numeric" value="${quantity || ""}" placeholder="0" data-card-qty data-card-index="${card._index}" data-rank="${rank}" data-price="${price}" aria-label="${escapeHtml(card.name)} ランク${rank}の枚数">
+                <input class="qty-num" type="number" min="0" max="99999" inputmode="numeric" value="${quantity || ""}" placeholder="0" data-card-qty data-card-index="${card._index}" data-rank="${rank}" data-price="${price}" aria-label="${escapeHtml(card.name)} ランク${rank}の枚数">
                 <button class="qty-btn" type="button" data-qty-action="increase" data-card-index="${card._index}" data-rank="${rank}" data-price="${price}" aria-label="${escapeHtml(card.name)} ランク${rank}を1枚増やす">＋</button>
               </div>
             </td>
@@ -2504,7 +2505,7 @@
           n: name,
           t: type,
           p: previous ? Number(previous.p) || 0 : Number(price) || 0,
-          q: Math.min(quantity, 999),
+          q: Math.min(quantity, MAX_QUANTITY),
           memo: previous?.memo || ""
         };
       }
@@ -2514,7 +2515,7 @@
     function updateQtyManually(name, type, price, value) {
       if (isViewingLog) return;
       const key = `${name}-${type}`;
-      const quantity = Math.min(Math.max(parseInt(value, 10) || 0, 0), 999);
+      const quantity = Math.min(Math.max(parseInt(value, 10) || 0, 0), MAX_QUANTITY);
       const previous = inputs[key];
       if (quantity === (Number(previous?.q) || 0)) return;
       pushUndo("数量直接入力");
@@ -2713,7 +2714,7 @@
             <div class="drawer-item-actions">
               <div class="qty-ctrl has-value">
                 <button class="qty-btn" type="button" data-drawer-action="decrease" data-key="${encodedKey}" aria-label="1枚減らす">−</button>
-                <input class="qty-num" type="number" min="0" max="999" inputmode="numeric" value="${Number(item.q)}" data-drawer-qty data-key="${encodedKey}" aria-label="数量">
+                <input class="qty-num" type="number" min="0" max="99999" inputmode="numeric" value="${Number(item.q)}" data-drawer-qty data-key="${encodedKey}" aria-label="数量">
                 <button class="qty-btn" type="button" data-drawer-action="increase" data-key="${encodedKey}" aria-label="1枚増やす">＋</button>
               </div>
             </div>
@@ -2767,7 +2768,7 @@
                 ${readonly ? `<b>${Number(item.q)}</b>` : `
                   <div class="qty-ctrl has-value no-print" style="margin:auto;">
                     <button class="qty-btn" type="button" data-receipt-action="decrease" data-key="${encodedKey}" aria-label="1枚減らす">−</button>
-                    <input class="qty-num" type="number" min="0" max="999" inputmode="numeric" value="${Number(item.q)}" data-receipt-qty data-key="${encodedKey}" aria-label="数量">
+                    <input class="qty-num" type="number" min="0" max="99999" inputmode="numeric" value="${Number(item.q)}" data-receipt-qty data-key="${encodedKey}" aria-label="数量">
                     <button class="qty-btn" type="button" data-receipt-action="increase" data-key="${encodedKey}" aria-label="1枚増やす">＋</button>
                   </div>
                   <span class="print-only"><b>${Number(item.q)}</b></span>`}
