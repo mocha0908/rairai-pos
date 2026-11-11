@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#16213e">
+  <meta name="color-scheme" content="light dark">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>査定結果のご確認｜カードショップ雷雷</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap">
+  <link rel="stylesheet" href="rairai-theme.css">
+  <script src="rairai-config.js" defer></script>
+  <style>
+    /* 色は rairai-theme.css の共通トークンから取る（ライト／ダークは共通ファイル側で切り替え） */
+    :root {
+      --bar: var(--pk-bar, #16213e);
+      --fill: var(--pk-fill, #16213e);
+      --fill-hover: var(--pk-fill-hover, #24345f);
+      --fill-soft: var(--pk-fill-soft, #e8ebf3);
+      --heading: var(--pk-ink, #16213e);
+      --link: var(--pk-link, #2c4bb3);
+      --ink-900: var(--pk-ink, #16213e);
+      --ink-700: var(--pk-ink-2, #3d4863);
+      --ink-500: var(--pk-muted, #66708a);
+      --ink-400: var(--pk-subtle, #9aa3b5);
+      --line: var(--pk-line, #dce1ea);
+      --line-strong: var(--pk-line-strong, #c6cedb);
+      --surface: var(--pk-surface, #fff);
+      --surface-soft: var(--pk-surface-2, #f6f8fb);
+      --canvas: var(--pk-canvas, #eef1f6);
+      --success: var(--pk-green, #1f8a5b);
+      --success-bg: var(--pk-green-soft, #e6f4ec);
+      --success-line: var(--pk-green-line, #a9d8bf);
+      --warning: var(--pk-gold-text, #6e5100);
+      --warning-bg: var(--pk-gold-soft, #fbf3d9);
+      --danger: var(--pk-red, #c8402f);
+      --danger-bg: var(--pk-red-soft, #fcedea);
+      --danger-line: var(--pk-red-line, #edb8ae);
+      --accept: var(--pk-green, #1f8a5b);
+      --accept-bg: var(--pk-green-soft, #e6f4ec);
+      --return: var(--pk-red, #c8402f);
+      --return-bg: var(--pk-red-soft, #fcedea);
+      --partial: var(--pk-blue, #3557c8);
+      --partial-bg: var(--pk-blue-soft, #e8edfb);
+      --shadow: var(--pk-shadow-1, 0 1px 2px rgba(22, 33, 62, .06));
+      --radius-lg: 14px;
+      --radius-md: 10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { background: var(--canvas); }
+    body {
+      margin: 0;
+      min-width: 320px;
+      padding-bottom: calc(96px + env(safe-area-inset-bottom));
+      background: var(--canvas);
+      color: var(--ink-900);
+      font-family: var(--pk-font, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, system-ui, sans-serif);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; touch-action: manipulation; }
+    button:disabled { cursor: not-allowed; }
+    :focus-visible { outline: 3px solid var(--pk-focus, rgba(232, 185, 49, .6)); outline-offset: 2px; }
+    [hidden] { display: none !important; }
+
+    .hero {
+      padding: 16px 18px 46px;
+      background: var(--bar);
+      color: #fff;
+    }
+    .is-verified .hero { padding-bottom: 40px; }
+    .is-verified .hero p { display: none; }
+    .hero-inner, .shell { width: min(720px, 100%); margin: 0 auto; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-name { font-size: .88rem; font-weight: 700; }
+    .hero h1 { margin: 12px 0 2px; font-size: clamp(1.3rem, 4.6vw, 1.7rem); line-height: 1.35; }
+    .hero p { margin: 0; color: rgba(255, 255, 255, .74); font-size: .86rem; }
+
+    .shell { position: relative; margin-top: -32px; padding: 0 14px; }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 20px 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .panel + .panel { margin-top: 14px; }
+    .panel-title { margin: 0 0 4px; color: var(--heading); font-size: 1.12rem; font-weight: 700; }
+    .panel-title:focus { outline: none; }
+    .panel-lead { margin: 0 0 16px; color: var(--ink-500); font-size: .84rem; }
+
+    .progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px; }
+    .progress span { height: 5px; border-radius: 999px; background: var(--line); }
+    .progress span.is-done { background: var(--fill); }
+    .progress-labels { display: grid; grid-template-columns: repeat(3, 1fr); margin: -8px 0 14px; color: var(--ink-500); font-size: .66rem; font-weight: 700; text-align: center; }
+    .progress-labels .is-current { color: var(--link); }
+
+    .status {
+      margin: 0 0 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 11px 13px;
+      background: var(--surface);
+      font-size: .84rem;
+      font-weight: 400;
+    }
+    .status.is-error { border-color: var(--danger-line); background: var(--danger-bg); color: var(--danger); }
+    .status.is-success { border-color: var(--success-line); background: var(--success-bg); color: var(--success); }
+
+    .field-label { display: block; margin: 0 0 6px; color: var(--ink-700); font-size: .8rem; font-weight: 700; }
+    .control {
+      width: 100%;
+      min-height: 50px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-md);
+      padding: 11px 13px;
+      background: var(--surface);
+      color: var(--ink-900);
+      font-size: 1rem;
+    }
+    .control:focus { border-color: var(--fill); box-shadow: 0 0 0 4px var(--fill-soft); outline: none; }
+    .tel4 { max-width: 220px; font-size: 1.6rem; font-weight: 700; letter-spacing: .5em; text-align: center; font-variant-numeric: tabular-nums; }
+    .hint { margin: 6px 0 0; color: var(--ink-500); font-size: .74rem; }
+    .field + .field { margin-top: 14px; }
+    .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .field-grid .is-wide { grid-column: 1 / -1; }
+
+    .btn {
+      min-height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      font-size: .95rem;
+      font-weight: 700;
+    }
+    .btn-primary { background: var(--fill); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--fill-hover); }
+    .btn-primary:disabled { background: var(--line-strong); color: var(--ink-500); box-shadow: none; }
+    .btn-secondary { border-color: var(--line-strong); background: var(--surface); color: var(--ink-700); }
+    .btn-block { width: 100%; }
+    .button-row { display: flex; gap: 10px; margin-top: 18px; }
+    .button-row .btn { flex: 1; }
+    .button-row .btn-secondary { flex: 0 0 auto; }
+
+    .offer-meta { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: end; }
+    .offer-name { color: var(--heading); font-size: 1.08rem; font-weight: 700; }
+    .offer-sub { color: var(--ink-500); font-size: .74rem; }
+    .offer-total { color: var(--ink-500); font-size: .72rem; text-align: right; }
+    .offer-total b { display: block; color: var(--ink-900); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+    .bulk-box { margin: 14px 0 0; border: 1px solid var(--line); border-radius: var(--radius-md); padding: 10px; background: var(--surface-soft); }
+    .bulk-title { margin-bottom: 8px; color: var(--ink-700); font-size: .78rem; font-weight: 700; }
+    .bulk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .bulk-row button {
+      min-height: 44px;
+      border: 2px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--surface);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+    .bulk-row [data-bulk="accept"] { border-color: var(--accept); color: var(--accept); }
+    .bulk-row [data-bulk="return"] { border-color: var(--return); color: var(--return); }
+    .bulk-row button.is-active[data-bulk="accept"] { background: var(--accept); color: #fff; }
+    .bulk-row button.is-active[data-bulk="return"] { background: var(--return); color: #fff; }
+    .bulk-hint { margin: 8px 0 0; color: var(--ink-500); font-size: .72rem; }
+
+    .lines { display: grid; gap: 6px; margin-top: 12px; }
+    .line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--line-strong);
+      border-radius: 10px;
+      padding: 8px 10px 8px 11px;
+      background: var(--surface);
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .line.is-accept { border-color: var(--success-line); border-left-color: var(--accept); background: var(--accept-bg); }
+    .line.is-return { border-color: var(--danger-line); border-left-color: var(--return); background: var(--return-bg); }
+    .line.is-partial { border-color: var(--line-strong); border-left-color: var(--partial); background: var(--partial-bg); }
+    .line-main { min-width: 0; }
+    .line-name {
+      display: -webkit-box;
+      overflow: hidden;
+      font-size: .82rem;
+      font-weight: 700;
+      line-height: 1.35;
+      word-break: break-word;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+    .line-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; margin-top: 2px; color: var(--ink-500); font-size: .72rem; font-variant-numeric: tabular-nums; }
+    .line-status { font-weight: 700; }
+    .is-accept .line-status { color: var(--accept); }
+    .is-return .line-status { color: var(--return); }
+    .is-partial .line-status { color: var(--partial); }
+    .choice { display: grid; grid-template-columns: 58px 76px; gap: 4px; }
+    .choice button {
+      height: 40px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      padding: 0;
+      background: var(--surface);
+      color: var(--ink-700);
+      font-size: .76rem;
+      font-weight: 700;
+    }
+    .choice button[aria-pressed="true"][data-choice="accept"] { border-color: var(--accept); background: var(--accept); color: #fff; }
+    .choice button[aria-pressed="true"][data-choice="return"] { border-color: var(--return); background: var(--return); color: #fff; }
+    .qty-pick { display: grid; grid-template-columns: 40px 54px 40px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); }
+    .qty-pick button { height: 40px; border: 0; background: transparent; color: var(--ink-900); font-size: 1.1rem; font-weight: 700; }
+    .qty-pick button:disabled { color: var(--ink-400); }
+    .qty-pick output { display: grid; place-items: center; border-inline: 1px solid var(--line); font-size: .92rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+    .qty-pick output small { margin-top: 2px; color: var(--ink-500); font-size: .6rem; font-weight: 700; }
+    .line.is-fixed { border-style: dashed; border-left-style: solid; border-left-color: var(--ink-400); background: var(--surface-soft); }
+    .fixed-badge { border-radius: 5px; padding: 0 5px; background: var(--line); color: var(--ink-700); font-size: .66rem; font-weight: 700; }
+    .fixed-amount { font-size: .9rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .lines-hint { margin: 10px 0 0; color: var(--ink-500); font-size: .72rem; }
+
+    .note { margin: 14px 0 0; border-radius: 10px; padding: 10px 12px; background: var(--warning-bg); color: var(--warning); font-size: .78rem; font-weight: 400; }
+
+    .sticky-total {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 20;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      backdrop-filter: blur(12px);
+    }
+    .sticky-inner { width: min(720px, 100%); margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+    .sticky-copy { flex: 1; min-width: 0; font-size: .74rem; color: var(--ink-500); line-height: 1.35; }
+    .sticky-copy b { display: block; color: var(--ink-900); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+    .sticky-inner .btn { min-width: 132px; }
+
+    .bank-card { border: 1px solid var(--line); border-radius: var(--radius-md); padding: 13px; background: var(--surface-soft); }
+    .bank-card dl { display: grid; grid-template-columns: 6.5em 1fr; gap: 4px 10px; margin: 0; font-size: .86rem; }
+    .bank-card dt { color: var(--ink-500); font-weight: 400; }
+    .bank-card dd { margin: 0; font-weight: 700; word-break: break-word; }
+    .radio-card { display: flex; align-items: flex-start; gap: 10px; margin-top: 10px; border: 1px solid var(--line-strong); border-radius: var(--radius-md); padding: 13px; background: var(--surface); font-weight: 700; }
+    .radio-card input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--fill); }
+    .radio-card small { display: block; color: var(--ink-500); font-weight: 400; }
+    .bank-form { margin-top: 14px; }
+
+    .summary { display: grid; gap: 8px; margin: 0; }
+    .summary-row { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 8px; font-size: .86rem; }
+    .summary-row dt { color: var(--ink-500); font-weight: 400; }
+    .summary-row dd { margin: 0; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+    .summary-row.is-total dd { color: var(--accept); font-size: 1.2rem; }
+    details.lines-detail { margin-top: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; font-size: .8rem; }
+    details.lines-detail summary { cursor: pointer; font-weight: 700; color: var(--ink-700); }
+    details.lines-detail ul { margin: 8px 0 0; padding-left: 1.1em; color: var(--ink-700); }
+
+    .sign-wrap { position: relative; margin-top: 6px; }
+    .sign-pad {
+      width: 100%;
+      height: 190px;
+      display: block;
+      border: 2px dashed var(--line-strong);
+      border-radius: var(--radius-md);
+      background: #fff;
+      touch-action: none;
+      cursor: crosshair;
+    }
+    .sign-pad.has-ink { border-style: solid; border-color: var(--fill); }
+    .sign-placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: #a6afbf; font-size: .9rem; font-weight: 400; pointer-events: none; }
+    .sign-tools { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; color: var(--ink-500); font-size: .74rem; }
+    .link-btn { border: 0; padding: 4px 0; background: none; color: var(--link); font-size: .8rem; font-weight: 700; text-decoration: underline; }
+    .agree { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; border: 1px solid var(--line-strong); border-radius: var(--radius-md); padding: 13px; font-size: .84rem; font-weight: 700; }
+    .agree input { width: 22px; height: 22px; margin: 1px 0 0; flex: 0 0 auto; accent-color: var(--fill); }
+    .agree small { display: block; margin-top: 2px; color: var(--ink-500); font-weight: 400; }
+
+    .done-icon { width: 64px; height: 64px; display: grid; place-items: center; margin: 4px auto 12px; border-radius: 50%; background: var(--success-bg); color: var(--success); font-size: 2rem; font-weight: 700; }
+    .center { text-align: center; }
+    .muted { color: var(--ink-500); font-size: .78rem; }
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255, 255, 255, .4); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .pk-legal { margin-top: 24px; }
+
+    @media (max-width: 420px) {
+      .panel { padding: 18px 14px; }
+      .field-grid { grid-template-columns: 1fr; }
+      .sticky-inner .btn { min-width: 112px; padding-inline: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="brand">
+        <div class="pk-mark is-kanji" aria-hidden="true">雷</div>
+        <div class="brand-name">カードショップ雷雷</div>
+      </div>
+      <h1>査定結果のご確認</h1>
+      <p>カードごとに「買取」か「キャンセル（返送）」をお選びください。</p>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+
+    <!-- 読み込み中 -->
+    <section id="view-loading" class="panel center">
+      <p class="muted">読み込んでいます…</p>
+    </section>
+
+    <!-- 本人確認 -->
+    <section id="view-verify" class="panel" hidden>
+      <h2 class="panel-title" tabindex="-1">電話番号の下4桁を入力してください</h2>
+      <p class="panel-lead">お申込み時にご登録いただいた電話番号の、下4桁をご入力ください。</p>
+      <form id="verify-form" novalidate>
+        <label class="field-label" for="tel4">電話番号の下4桁</label>
+        <input id="tel4" class="control tel4" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="0000" required>
+        <p id="tel4-hint" class="hint">入力を5回間違えると、このURLはロックされます。</p>
+        <button id="verify-btn" class="btn btn-primary btn-block" type="submit" style="margin-top:16px">査定結果を見る</button>
+      </form>
+    </section>
+
+    <!-- 1. カードごとの選択 -->
+    <section id="view-select" hidden>
+      <div class="panel">
+        <div class="progress" aria-hidden="true"><span class="is-done"></span><span></span><span></span></div>
+        <div class="progress-labels" aria-hidden="true"><span class="is-current">選択</span><span>振込先</span><span>承認</span></div>
+        <div class="offer-meta">
+          <div>
+            <div id="offer-name" class="offer-name"></div>
+            <div id="offer-expiry" class="offer-sub"></div>
+          </div>
+          <div class="offer-total">査定額（全品）<b id="offer-total"></b></div>
+        </div>
+        <div class="bulk-box">
+          <div class="bulk-title">まとめて選ぶ</div>
+          <div class="bulk-row">
+            <button type="button" id="all-accept" data-bulk="accept">全件 買取する</button>
+            <button type="button" id="all-return" data-bulk="return">全件 キャンセル</button>
+          </div>
+        </div>
+        <p class="lines-hint">2枚以上の行は、選んだあとに ＋／− で買取する枚数を変えられます。</p>
+        <div id="lines" class="lines"></div>
+        <p class="note">キャンセルしたカードは返送いたします。返送料はお客様のご負担（着払い）となります。</p>
+      </div>
+    </section>
+
+    <!-- 2. 振込先 -->
+    <section id="view-bank" class="panel" hidden>
+      <div class="progress" aria-hidden="true"><span class="is-done"></span><span class="is-done"></span><span></span></div>
+      <div class="progress-labels" aria-hidden="true"><span>選択</span><span class="is-current">振込先</span><span>承認</span></div>
+      <h2 class="panel-title" tabindex="-1">振込先のご確認</h2>
+      <p class="panel-lead">買取代金のお振込み先です。ご本人名義の口座に限ります。</p>
+      <div id="bank-current" class="bank-card"></div>
+      <label class="radio-card">
+        <input type="radio" name="bank-choice" value="keep" checked>
+        <span>この口座で受け取る</span>
+      </label>
+      <label class="radio-card">
+        <input type="radio" name="bank-choice" value="change">
+        <span>別の口座に変更する<small>店舗で確認のうえお振込みします。</small></span>
+      </label>
+      <div id="bank-form" class="bank-form" hidden>
+        <div class="field-grid">
+          <div class="field">
+            <label class="field-label" for="bankName">金融機関名</label>
+            <input id="bankName" class="control" type="text" maxlength="80" placeholder="〇〇銀行" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="field-label" for="bankBranch">支店名</label>
+            <input id="bankBranch" class="control" type="text" maxlength="80" placeholder="〇〇支店" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="field-label" for="bankType">口座種別</label>
+            <select id="bankType" class="control">
+              <option value="普通">普通</option>
+              <option value="当座">当座</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="bankNum">口座番号</label>
+            <input id="bankNum" class="control" type="text" inputmode="numeric" maxlength="8" placeholder="1234567" autocomplete="off">
+          </div>
+          <div class="field is-wide">
+            <label class="field-label" for="bankHolder">口座名義（全角カタカナ）</label>
+            <input id="bankHolder" class="control" type="text" maxlength="80" placeholder="ヤマダ タロウ" autocomplete="off">
+            <p id="bank-hint" class="hint">ご本人名義の口座をご入力ください。</p>
+          </div>
+        </div>
+      </div>
+      <div class="button-row">
+        <button class="btn btn-secondary" type="button" data-go="select">戻る</button>
+        <button class="btn btn-primary" type="button" id="bank-next">内容の確認へ</button>
+      </div>
+    </section>
+
+    <!-- 3. 確認・サイン -->
+    <section id="view-sign" class="panel" hidden>
+      <div class="progress" aria-hidden="true"><span class="is-done"></span><span class="is-done"></span><span class="is-done"></span></div>
+      <div class="progress-labels" aria-hidden="true"><span>選択</span><span>振込先</span><span class="is-current">承認</span></div>
+      <h2 class="panel-title" tabindex="-1">内容のご確認とサイン</h2>
+      <p class="panel-lead">内容をご確認のうえ、サインをして承認してください。</p>
+      <dl id="sign-summary" class="summary"></dl>
+      <div id="sign-details"></div>
+
+      <div class="field" style="margin-top:18px">
+        <label class="field-label" for="signerName">お名前（フルネーム）</label>
+        <input id="signerName" class="control" type="text" maxlength="80" autocomplete="name">
+      </div>
+      <div class="field">
+        <span class="field-label" id="sign-label">サイン</span>
+        <div class="sign-wrap">
+          <canvas id="sign-pad" class="sign-pad" aria-labelledby="sign-label" role="img"></canvas>
+          <div id="sign-placeholder" class="sign-placeholder">ここに指またはペンでサインしてください</div>
+        </div>
+        <div class="sign-tools">
+          <span>枠の中に、お名前をお書きください</span>
+          <button id="sign-clear" class="link-btn" type="button">書き直す</button>
+        </div>
+      </div>
+
+      <label class="agree">
+        <input id="agree" type="checkbox">
+        <span id="agree-text">上記の内容に同意します</span>
+      </label>
+
+      <div class="button-row">
+        <button class="btn btn-secondary" type="button" id="sign-back">戻る</button>
+        <button class="btn btn-primary" type="button" id="submit-btn">承認して送信</button>
+      </div>
+    </section>
+
+    <!-- 完了・回答済み -->
+    <section id="view-done" class="panel" hidden>
+      <div class="done-icon" aria-hidden="true">✓</div>
+      <h2 id="done-title" class="panel-title center" tabindex="-1">回答を受け付けました</h2>
+      <p id="done-lead" class="panel-lead center">ありがとうございました。内容を確認のうえ、店舗よりお振込み・返送の手続きを進めます。</p>
+      <dl id="done-summary" class="summary"></dl>
+      <div id="done-details"></div>
+      <p class="muted center" style="margin-top:16px">この画面は閉じていただいて構いません。</p>
+    </section>
+
+    <!-- エラー・期限切れなど -->
+    <section id="view-message" class="panel center" hidden>
+      <h2 id="message-title" class="panel-title" tabindex="-1"></h2>
+      <p id="message-text" class="panel-lead"></p>
+    </section>
+
+    <!-- 古物営業法に基づく表示。氏名または名称は許可証の記載どおりにしてください -->
+    <!-- 表示内容は rairai-config.js で設定します -->
+    <footer class="pk-legal" data-shop-legal></footer>
+  </main>
+
+  <div id="sticky-total" class="sticky-total" hidden>
+    <div class="sticky-inner">
+      <div id="sticky-copy" class="sticky-copy"></div>
+      <button id="select-next" class="btn btn-primary" type="button">次へ</button>
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwi7tWn74PWL-HD59oj7p1DZDdfddMn4wdJRJCCZJKznuBSLZ6GA88W6Lp-g1RrFkkSOw/exec";
+    const TERMS_VERSION = "2026-07-29";
+    const REQUEST_TIMEOUT_MS = 25000;
+
+    const state = {
+      token: "",
+      tel4: "",
+      offer: null,
+      choices: {},          // lineId -> 買取枚数（未選択は undefined）
+      bankChange: null,
+      requestId: "",
+      submitting: false
+    };
+    const byId = (id) => document.getElementById(id);
+    const VIEWS = ["loading", "verify", "select", "bank", "sign", "done", "message"];
+
+    document.addEventListener("DOMContentLoaded", initialize);
+
+    function initialize() {
+      const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+      state.token = String(params.get("t") || "").trim().toLowerCase();
+      if (!/^[a-f0-9]{64}$/.test(state.token)) {
+        showMessage("URLが正しくありません", "店舗から届いたURLを、もう一度そのまま開いてください。");
+        return;
+      }
+      byId("verify-form").addEventListener("submit", verify);
+      byId("tel4").addEventListener("input", (event) => {
+        event.target.value = toHalfDigits(event.target.value).slice(0, 4);
+      });
+      byId("all-accept").addEventListener("click", () => setAll("accept"));
+      byId("all-return").addEventListener("click", () => setAll("return"));
+      byId("lines").addEventListener("click", handleLineClick);
+      byId("select-next").addEventListener("click", goFromSelect);
+      document.querySelectorAll("[data-go]").forEach((button) => button.addEventListener("click", () => show(button.dataset.go)));
+      document.querySelectorAll('input[name="bank-choice"]').forEach((input) => input.addEventListener("change", updateBankForm));
+      byId("bankNum").addEventListener("input", (event) => { event.target.value = toHalfDigits(event.target.value).slice(0, 8); });
+      byId("bank-next").addEventListener("click", goFromBank);
+      byId("sign-back").addEventListener("click", () => show(acceptedCardQty() > 0 ? "bank" : "select"));
+      byId("submit-btn").addEventListener("click", submit);
+      byId("sign-clear").addEventListener("click", () => signaturePad.clear());
+      signaturePad.init(byId("sign-pad"));
+      show("verify");
+      window.setTimeout(() => byId("tel4").focus(), 50);
+    }
+
+    // ===== 画面切り替え =====
+    function show(name) {
+      VIEWS.forEach((view) => { byId(`view-${view}`).hidden = view !== name; });
+      byId("sticky-total").hidden = name !== "select";
+      if (name !== "verify") clearStatus();
+      if (name === "select") renderLines();
+      if (name === "bank") renderBank();
+      if (name === "sign") {
+        renderSignSummary();
+        signaturePad.resize();
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.setTimeout(() => byId(`view-${name}`).querySelector(".panel-title")?.focus({ preventScroll: true }), 120);
+    }
+
+    function showMessage(title, text) {
+      byId("message-title").textContent = title;
+      byId("message-text").textContent = text;
+      show("message");
+    }
+
+    function setStatus(message, type = "") {
+      const status = byId("status");
+      status.textContent = message;
+      status.className = `status ${type ? `is-${type}` : ""}`;
+      status.hidden = false;
+    }
+
+    function clearStatus() {
+      byId("status").hidden = true;
+    }
+
+    // ===== 通信 =====
+    async function api(action, data) {
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+      try {
+        const response = await fetch(GAS_URL, {
+          method: "POST",
+          body: JSON.stringify(Object.assign({}, data, { action, token: state.token })),
+          cache: "no-store",
+          referrerPolicy: "no-referrer",
+          signal: controller.signal
+        });
+        const json = await response.json();
+        if (!json || json.result !== "SUCCESS") {
+          const error = new Error(json?.message || "処理できませんでした。");
+          error.code = json?.code || "";
+          error.field = json?.field || "";
+          throw error;
+        }
+        return json;
+      } catch (error) {
+        if (error.name === "AbortError") {
+          const timeout = new Error("通信がタイムアウトしました。電波の良い場所でもう一度お試しください。");
+          timeout.code = "TIMEOUT";
+          throw timeout;
+        }
+        if (!error.code) error.message = "通信できませんでした。電波の良い場所でもう一度お試しください。";
+        throw error;
+      } finally {
+        window.clearTimeout(timer);
+      }
+    }
+
+    function handleFatalError(error) {
+      const titles = {
+        OFFER_NOT_FOUND: "URLが無効です",
+        OFFER_CANCELLED: "このURLは無効になりました",
+        OFFER_LOCKED: "URLがロックされました",
+        OFFER_EXPIRED: "回答期限を過ぎています",
+        OFFER_CHANGED: "査定内容が更新されました"
+      };
+      if (titles[error.code]) {
+        showMessage(titles[error.code], error.message);
+        return true;
+      }
+      return false;
+    }
+
+    // ===== 本人確認 =====
+    async function verify(event) {
+      event.preventDefault();
+      const tel4 = toHalfDigits(byId("tel4").value);
+      if (!/^\d{4}$/.test(tel4)) {
+        setStatus("電話番号の下4桁（数字4つ）を入力してください。", "error");
+        byId("tel4").focus();
+        return;
+      }
+      const button = byId("verify-btn");
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner" aria-hidden="true"></span>確認しています';
+      try {
+        const result = await api("offer_open", { tel4 });
+        state.tel4 = tel4;
+        state.offer = result.offer;
+        document.body.classList.add("is-verified");
+        clearStatus();
+        routeByStatus();
+      } catch (error) {
+        if (!handleFatalError(error)) {
+          setStatus(error.message, "error");
+          byId("tel4").select();
+        }
+      } finally {
+        button.disabled = false;
+        button.textContent = "査定結果を見る";
+      }
+    }
+
+    function routeByStatus() {
+      const offer = state.offer;
+      if (offer.status === "回答待ち") {
+        byId("offer-name").textContent = `${offer.customerName} 様`;
+        byId("offer-expiry").textContent = `回答期限：${formatDateTime(offer.expiresAt)}`;
+        byId("offer-total").textContent = formatYen(offer.totalAmount);
+        byId("signerName").value = "";
+        byId("signerName").placeholder = offer.customerName || "山田 太郎";
+        show("select");
+        return;
+      }
+      if (offer.status === "期限切れ") {
+        showMessage("回答期限を過ぎています", `回答期限（${formatDateTime(offer.expiresAt)}）を過ぎたため、このページからは回答できません。お手数ですが店舗へご連絡ください。`);
+        return;
+      }
+      // 回答済み・確定済み
+      showDone(offer, true);
+    }
+
+    // ===== カードごとの選択 =====
+    function cardLines() {
+      return state.offer.lines.filter((line) => line.p >= 0);
+    }
+
+    function deductionLines() {
+      return state.offer.lines.filter((line) => line.p < 0);
+    }
+
+    function acceptedCardQty() {
+      return cardLines().reduce((sum, line) => sum + (Number(state.choices[line.lineId]) || 0), 0);
+    }
+
+    function totals() {
+      const accepted = acceptedCardQty();
+      let amount = cardLines().reduce((sum, line) => sum + line.p * (Number(state.choices[line.lineId]) || 0), 0);
+      if (accepted > 0) amount += deductionLines().reduce((sum, line) => sum + line.p * line.q, 0);
+      const returned = cardLines().reduce((sum, line) => sum + (state.choices[line.lineId] === undefined ? 0 : line.q - state.choices[line.lineId]), 0);
+      const undecided = cardLines().filter((line) => state.choices[line.lineId] === undefined).length;
+      return { accepted, amount: accepted > 0 ? amount : 0, returned, undecided };
+    }
+
+    function renderLines() {
+      byId("lines").innerHTML = cardLines().map((line) => {
+        const value = state.choices[line.lineId];
+        const decided = value !== undefined;
+        const kind = !decided ? "" : value === line.q ? "accept" : value === 0 ? "return" : "partial";
+        const status = !decided ? ""
+          : kind === "accept" ? "買取"
+          : kind === "return" ? "キャンセル"
+          : `買取${value}枚・返送${line.q - value}枚`;
+        // 2枚以上の行は、選んだあとに枚数を ＋／− で調整（0＝全部キャンセル、最大＝全部買取）
+        const control = decided && line.q > 1
+          ? `<div class="qty-pick" role="group" aria-label="${escapeHtml(line.n)}の買取枚数">
+               <button type="button" data-step="-1" aria-label="買取を1枚減らす" ${value <= 0 ? "disabled" : ""}>−</button>
+               <output aria-live="polite">${value}<small>/${line.q}枚</small></output>
+               <button type="button" data-step="1" aria-label="買取を1枚増やす" ${value >= line.q ? "disabled" : ""}>＋</button>
+             </div>`
+          : `<div class="choice" role="group" aria-label="${escapeHtml(line.n)}の選択">
+               <button type="button" data-choice="accept" aria-pressed="${kind === "accept"}">買取</button>
+               <button type="button" data-choice="return" aria-pressed="${kind === "return"}">キャンセル</button>
+             </div>`;
+        return `
+          <article class="line ${kind ? `is-${kind}` : ""}" data-line="${escapeHtml(line.lineId)}">
+            <div class="line-main">
+              <div class="line-name" title="${escapeHtml(line.n)}">${escapeHtml(line.n)}</div>
+              <div class="line-meta">
+                <span class="pk-rank" data-rank="${escapeHtml(line.t)}" aria-label="ランク${escapeHtml(line.t)}">${escapeHtml(line.t)}</span>
+                <span>${formatYen(line.p)}${line.q > 1 ? ` × ${line.q}枚` : ""}</span>
+                ${status ? `<span class="line-status">${status}</span>` : ""}
+              </div>
+            </div>
+            ${control}
+          </article>`;
+      }).join("") + deductionLines().map((line) => {
+        // 手数料・送料などのマイナス項目は変更不可。常に一番下に表示する
+        const applied = acceptedCardQty() > 0;
+        return `
+          <article class="line is-fixed">
+            <div class="line-main">
+              <div class="line-name">${escapeHtml(line.n)}</div>
+              <div class="line-meta">
+                <span class="fixed-badge">変更不可</span>
+                <span>${applied ? "お振込み金額から差し引き" : "買取があれば差し引き"}</span>
+              </div>
+            </div>
+            <div class="fixed-amount">${applied ? formatYen(line.p * line.q) : formatYen(0)}</div>
+          </article>`;
+      }).join("");
+      const sum = totals();
+      const allAccept = !sum.undecided && sum.returned === 0 && sum.accepted > 0;
+      const allReturn = !sum.undecided && sum.accepted === 0;
+      byId("all-accept").classList.toggle("is-active", allAccept);
+      byId("all-return").classList.toggle("is-active", allReturn);
+      byId("all-accept").setAttribute("aria-pressed", String(allAccept));
+      byId("all-return").setAttribute("aria-pressed", String(allReturn));
+      renderSticky();
+    }
+
+    function renderSticky() {
+      const sum = totals();
+      byId("sticky-copy").innerHTML = sum.undecided
+        ? `あと <b style="display:inline;font-size:1rem">${sum.undecided}件</b> 選んでください`
+        : `買取 ${sum.accepted}枚・キャンセル ${sum.returned}枚<b>${formatYen(sum.amount)}</b>`;
+      byId("select-next").disabled = sum.undecided > 0;
+    }
+
+    function handleLineClick(event) {
+      const lineElement = event.target.closest("[data-line]");
+      if (!lineElement) return;
+      const line = cardLines().find((item) => item.lineId === lineElement.dataset.line);
+      if (!line) return;
+      const choice = event.target.closest("[data-choice]")?.dataset.choice;
+      const step = Number(event.target.closest("[data-step]")?.dataset.step || 0);
+      if (choice === "accept") {
+        state.choices[line.lineId] = line.q;
+      } else if (choice === "return") {
+        state.choices[line.lineId] = 0;
+      } else if (step) {
+        state.choices[line.lineId] = Math.min(line.q, Math.max(0, (Number(state.choices[line.lineId]) || 0) + step));
+      } else {
+        return;
+      }
+      renderLines();
+    }
+
+    function setAll(kind) {
+      cardLines().forEach((line) => {
+        state.choices[line.lineId] = kind === "accept" ? line.q : 0;
+      });
+      renderLines();
+    }
+
+    function goFromSelect() {
+      const sum = totals();
+      if (sum.undecided) return;
+      if (sum.accepted > 0 && sum.amount < 0) {
+        setStatus("差し引き後の金額がマイナスになります。選択を見直すか、店舗へご連絡ください。", "error");
+        return;
+      }
+      show(sum.accepted > 0 ? "bank" : "sign");
+    }
+
+    // ===== 振込先 =====
+    function renderBank() {
+      const bank = state.offer.bank || {};
+      const hasBank = Boolean(bank.bankName && bank.bankNumMasked);
+      byId("bank-current").innerHTML = hasBank ? `
+        <dl>
+          <dt>金融機関</dt><dd>${escapeHtml(bank.bankName)}</dd>
+          <dt>支店</dt><dd>${escapeHtml(bank.bankBranch || "—")}</dd>
+          <dt>口座種別</dt><dd>${escapeHtml(bank.bankType || "—")}</dd>
+          <dt>口座番号</dt><dd>${escapeHtml(bank.bankNumMasked)}</dd>
+          <dt>名義</dt><dd>${escapeHtml(bank.bankHolder || "—")}</dd>
+        </dl>` : `<p class="muted" style="margin:0">振込先が登録されていません。下の「別の口座に変更する」からご入力ください。</p>`;
+      const keep = document.querySelector('input[name="bank-choice"][value="keep"]');
+      keep.disabled = !hasBank;
+      if (!hasBank) document.querySelector('input[name="bank-choice"][value="change"]').checked = true;
+      updateBankForm();
+    }
+
+    function updateBankForm() {
+      const change = document.querySelector('input[name="bank-choice"]:checked')?.value === "change";
+      byId("bank-form").hidden = !change;
+    }
+
+    function goFromBank() {
+      const change = document.querySelector('input[name="bank-choice"]:checked')?.value === "change";
+      if (!change) {
+        state.bankChange = null;
+        show("sign");
+        return;
+      }
+      const bank = {
+        bankName: byId("bankName").value.trim(),
+        bankBranch: byId("bankBranch").value.trim(),
+        bankType: byId("bankType").value,
+        bankNum: toHalfDigits(byId("bankNum").value),
+        bankHolder: byId("bankHolder").value.replace(/[ \t　]+/g, " ").trim()
+      };
+      const error =
+        !bank.bankName ? ["bankName", "金融機関名を入力してください。"] :
+        !bank.bankBranch ? ["bankBranch", "支店名を入力してください。"] :
+        !/^\d{6,8}$/.test(bank.bankNum) ? ["bankNum", "口座番号は6〜8桁の数字で入力してください。"] :
+        !/^[ァ-ヶー・ 　]+$/.test(bank.bankHolder) ? ["bankHolder", "口座名義は全角カタカナで入力してください。"] : null;
+      if (error) {
+        setStatus(error[1], "error");
+        byId(error[0]).focus();
+        return;
+      }
+      state.bankChange = bank;
+      show("sign");
+    }
+
+    // ===== 確認・サイン =====
+    function bankLabel() {
+      if (state.bankChange) {
+        const bank = state.bankChange;
+        return `${bank.bankName} ${bank.bankBranch} ${bank.bankType} ****${bank.bankNum.slice(-4)}（変更後）`;
+      }
+      const bank = state.offer.bank || {};
+      return `${bank.bankName} ${bank.bankBranch} ${bank.bankType} ${bank.bankNumMasked}`;
+    }
+
+    function renderSignSummary() {
+      const sum = totals();
+      const rows = [
+        ["買取", `${sum.accepted}枚`],
+        ["キャンセル（返送）", `${sum.returned}枚`]
+      ];
+      if (sum.accepted > 0) {
+        deductionLines().forEach((line) => rows.push([`${line.n}（差し引き）`, formatYen(line.p * line.q)]));
+        rows.push(["振込先", bankLabel()]);
+      }
+      rows.push(["お振込み金額", formatYen(sum.amount), true]);
+      byId("sign-summary").innerHTML = rows.map(([label, value, total]) => `
+        <div class="summary-row ${total ? "is-total" : ""}"><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("");
+
+      const accepted = cardLines().filter((line) => state.choices[line.lineId] > 0);
+      const returned = cardLines().filter((line) => state.choices[line.lineId] < line.q);
+      byId("sign-details").innerHTML = [
+        accepted.length ? detailsList("買取するカード", accepted.map((line) => `${line.n}（${line.t}）× ${state.choices[line.lineId]}枚`)) : "",
+        returned.length ? detailsList("キャンセル（返送）するカード", returned.map((line) => `${line.n}（${line.t}）× ${line.q - state.choices[line.lineId]}枚`)) : ""
+      ].join("");
+
+      const parts = ["上記の内容に同意します。"];
+      if (sum.accepted > 0) parts.push("振込先が本人名義の口座であることを確認しました。");
+      if (sum.returned > 0) parts.push("キャンセル分が着払いで返送されることを了承します。");
+      byId("agree-text").innerHTML = `${escapeHtml(parts[0])}${parts.length > 1 ? `<small>${escapeHtml(parts.slice(1).join(""))}</small>` : ""}`;
+    }
+
+    function detailsList(title, items) {
+      return `<details class="lines-detail"><summary>${escapeHtml(title)}（${items.length}件）</summary><ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></details>`;
+    }
+
+    async function submit() {
+      if (state.submitting) return;
+      const signerName = byId("signerName").value.replace(/[ \t　]+/g, " ").trim();
+      if (!signerName) {
+        setStatus("お名前（フルネーム）を入力してください。", "error");
+        byId("signerName").focus();
+        return;
+      }
+      if (!signaturePad.isSigned()) {
+        setStatus("枠の中にサインをご記入ください。", "error");
+        byId("sign-pad").scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      if (!byId("agree").checked) {
+        setStatus("内容への同意にチェックを入れてください。", "error");
+        byId("agree").focus();
+        return;
+      }
+
+      state.submitting = true;
+      // 同じ回答の再送は二重にならないよう、1回の回答には同じIDを使う
+      if (!state.requestId) state.requestId = createRequestId();
+      const button = byId("submit-btn");
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner" aria-hidden="true"></span>送信しています';
+      try {
+        const result = await api("offer_respond", {
+          tel4: state.tel4,
+          requestId: state.requestId,
+          contentHash: state.offer.contentHash,
+          selections: cardLines().map((line) => ({ lineId: line.lineId, acceptQty: Number(state.choices[line.lineId]) || 0 })),
+          bankChange: totals().accepted > 0 ? state.bankChange : null,
+          signerName,
+          signature: signaturePad.toDataURL(),
+          agreed: true,
+          termsVersion: TERMS_VERSION,
+          userAgent: navigator.userAgent
+        });
+        state.offer = result.offer;
+        showDone(result.offer, false);
+      } catch (error) {
+        if (error.code === "OFFER_ALREADY_ANSWERED") {
+          showMessage("回答済みです", "この査定にはすでに回答いただいています。内容を変更したい場合は店舗へご連絡ください。");
+        } else if (!handleFatalError(error)) {
+          if (["bankName", "bankBranch", "bankType", "bankNum", "bankHolder"].includes(error.field)) {
+            show("bank");
+            document.querySelector('input[name="bank-choice"][value="change"]').checked = true;
+            updateBankForm();
+            byId(error.field)?.focus();
+          }
+          setStatus(error.message, "error");
+        }
+      } finally {
+        state.submitting = false;
+        button.disabled = false;
+        button.textContent = "承認して送信";
+      }
+    }
+
+    function showDone(offer, alreadyAnswered) {
+      const answer = offer.answer || {};
+      byId("done-title").textContent = alreadyAnswered ? "回答済みです" : "回答を受け付けました";
+      byId("done-lead").textContent = alreadyAnswered
+        ? `${formatDateTime(answer.answeredAt)} に回答いただいています。内容を変更したい場合は店舗へご連絡ください。`
+        : "ありがとうございました。内容を確認のうえ、店舗よりお振込み・返送の手続きを進めます。";
+      const rows = [["買取", `${answer.acceptedQty || 0}枚`], ["キャンセル（返送）", `${answer.returnedQty || 0}枚`]];
+      if (answer.acceptedQty > 0 && answer.bank) {
+        rows.push(["振込先", `${answer.bank.bankName} ${answer.bank.bankBranch} ${answer.bank.bankNumMasked}${answer.bankChanged ? "（変更後）" : ""}`]);
+      }
+      rows.push(["お振込み金額", formatYen(answer.acceptedAmount || 0), true]);
+      byId("done-summary").innerHTML = rows.map(([label, value, total]) => `
+        <div class="summary-row ${total ? "is-total" : ""}"><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("");
+      const selections = (answer.selections || []).filter((line) => line.p >= 0);
+      if (answer.acceptedQty > 0) {
+        (answer.selections || []).filter((line) => line.p < 0 && line.acceptQty > 0)
+          .forEach((line) => rows.splice(rows.length - 1, 0, [`${line.n}（差し引き）`, formatYen(line.p * line.acceptQty)]));
+        byId("done-summary").innerHTML = rows.map(([label, value, total]) => `
+        <div class="summary-row ${total ? "is-total" : ""}"><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("");
+      }
+      byId("done-details").innerHTML = selections.length
+        ? detailsList("カードごとの内容", selections.map((line) => `${line.n}（${line.t}）：買取 ${line.acceptQty}枚／返送 ${line.returnQty}枚`))
+        : "";
+      show("done");
+    }
+
+    // ===== サインパッド =====
+    const signaturePad = {
+      canvas: null,
+      context: null,
+      drawing: false,
+      inkLength: 0,
+      last: null,
+      init(canvas) {
+        this.canvas = canvas;
+        this.context = canvas.getContext("2d");
+        canvas.addEventListener("pointerdown", (event) => this.start(event));
+        canvas.addEventListener("pointermove", (event) => this.move(event));
+        ["pointerup", "pointercancel", "pointerleave"].forEach((type) => canvas.addEventListener(type, () => this.end()));
+        window.addEventListener("resize", () => { if (!this.inkLength) this.resize(); });
+      },
+      resize() {
+        const rect = this.canvas.getBoundingClientRect();
+        if (!rect.width) return;
+        const ratio = Math.min(2, window.devicePixelRatio || 1);
+        this.canvas.width = Math.round(rect.width * ratio);
+        this.canvas.height = Math.round(rect.height * ratio);
+        this.context.setTransform(ratio, 0, 0, ratio, 0, 0);
+        this.clear();
+      },
+      clear() {
+        const { canvas, context } = this;
+        context.save();
+        context.setTransform(1, 0, 0, 1, 0, 0);
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.restore();
+        this.inkLength = 0;
+        canvas.classList.remove("has-ink");
+        byId("sign-placeholder").hidden = false;
+      },
+      point(event) {
+        const rect = this.canvas.getBoundingClientRect();
+        return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+      },
+      start(event) {
+        event.preventDefault();
+        this.canvas.setPointerCapture?.(event.pointerId);
+        this.drawing = true;
+        this.last = this.point(event);
+        byId("sign-placeholder").hidden = true;
+      },
+      move(event) {
+        if (!this.drawing) return;
+        event.preventDefault();
+        const point = this.point(event);
+        const context = this.context;
+        context.strokeStyle = "#111827";
+        context.lineWidth = event.pointerType === "pen" ? 2.2 + (event.pressure || .5) * 1.5 : 2.8;
+        context.lineCap = "round";
+        context.lineJoin = "round";
+        context.beginPath();
+        context.moveTo(this.last.x, this.last.y);
+        context.lineTo(point.x, point.y);
+        context.stroke();
+        this.inkLength += Math.hypot(point.x - this.last.x, point.y - this.last.y);
+        this.last = point;
+        if (this.inkLength > 0) this.canvas.classList.add("has-ink");
+      },
+      end() {
+        this.drawing = false;
+      },
+      isSigned() {
+        return this.inkLength > 40;
+      },
+      toDataURL() {
+        // 送信サイズを抑えるため最大幅600pxに縮小
+        const maxWidth = 600;
+        const scale = Math.min(1, maxWidth / this.canvas.width);
+        const output = document.createElement("canvas");
+        output.width = Math.round(this.canvas.width * scale);
+        output.height = Math.round(this.canvas.height * scale);
+        const context = output.getContext("2d");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, output.width, output.height);
+        context.drawImage(this.canvas, 0, 0, output.width, output.height);
+        return output.toDataURL("image/png");
+      }
+    };
+
+    // ===== 共通 =====
+    function toHalfDigits(value) {
+      return String(value || "").replace(/[０-９]/g, (character) => String.fromCharCode(character.charCodeAt(0) - 0xfee0)).replace(/\D/g, "");
+    }
+
+    function formatYen(value) {
+      const number = Number(value) || 0;
+      return number < 0 ? `−¥${Math.abs(number).toLocaleString("ja-JP")}` : `¥${number.toLocaleString("ja-JP")}`;
+    }
+
+    function formatDateTime(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value || "");
+      return new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric", weekday: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tokyo" }).format(date);
+    }
+
+    function createRequestId() {
+      return `resp_${window.crypto?.randomUUID?.() || `${Date.now()}_${Math.random().toString(36).slice(2, 12)}`}`;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
