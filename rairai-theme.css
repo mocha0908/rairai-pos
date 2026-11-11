@@ -1,0 +1,220 @@
+/*
+ * カードショップ雷雷 共通テーマ（POS・申込フォーム・お客様ページで共通）
+ * ※ 変数名の「--pk-」は共通テーマの接頭辞です（PKlab と同じ仕組みを使っています）
+ *
+ * 軸：「鑑定ラボ」
+ *   - 土台は紺（信頼）、アクセントは金の1色だけ
+ *   - 意味のある色は固定：緑＝買取・完了、赤＝キャンセル・マイナス・注意、青＝一部・情報
+ *   - 見せ場はランクタグ（S/A/B/C/D）だけ。ほかは静かに
+ *   - 文字は BIZ UDPゴシック。太さは 400 と 700 の2段階
+ *
+ * テーマの切り替え：
+ *   - <html data-theme="dark"> / "light" があればそれに従う（POS）
+ *   - なければ端末のダークモード設定に従う（お客様向けページ）
+ */
+
+:root {
+  color-scheme: light;
+  --pk-font: "BIZ UDPGothic", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, system-ui, sans-serif;
+
+  --pk-ink: #16213e;
+  --pk-ink-2: #3d4863;
+  --pk-muted: #66708a;
+  --pk-subtle: #9aa3b5;
+
+  --pk-canvas: #eef1f6;
+  --pk-surface: #ffffff;
+  --pk-surface-2: #f6f8fb;
+  --pk-surface-3: #eef1f6;
+  --pk-glass: rgba(255, 255, 255, 0.95);
+
+  --pk-line: #dce1ea;
+  --pk-line-soft: #e9edf3;
+  --pk-line-strong: #c6cedb;
+
+  /* ブランド：紺（ヘッダー・フッター帯）と、塗りボタン */
+  --pk-navy: #16213e;
+  --pk-navy-2: #24345f;
+  --pk-bar: #16213e;
+  --pk-fill: #16213e;
+  --pk-fill-hover: #24345f;
+  --pk-fill-soft: #e8ebf3;
+  --pk-fill-soft-2: #dde2ee;
+  --pk-fill-text: #16213e;
+  --pk-on-fill: #ffffff;
+
+  /* アクセント：金 */
+  --pk-gold: #e8b931;
+  --pk-gold-ink: #2e2300;
+  --pk-gold-soft: #fbf3d9;
+  --pk-gold-line: #e6cf85;
+  --pk-gold-text: #6e5100;
+
+  /* 意味の色 */
+  --pk-green: #1f8a5b;
+  --pk-green-soft: #e6f4ec;
+  --pk-green-line: #a9d8bf;
+  --pk-red: #c8402f;
+  --pk-red-soft: #fcedea;
+  --pk-red-line: #edb8ae;
+  --pk-blue: #3557c8;
+  --pk-blue-soft: #e8edfb;
+  --pk-link: #2c4bb3;
+
+  --pk-focus: rgba(232, 185, 49, 0.6);
+  --pk-shadow-1: 0 1px 2px rgba(22, 33, 62, 0.06);
+  --pk-shadow-2: 0 8px 24px rgba(22, 33, 62, 0.10);
+
+  /* ランクタグ（カードの状態ランク）。S は紺地に金文字 */
+  --pk-rank-s: #16213e;
+  --pk-rank-s-ink: #f0c445;
+  --pk-rank-a: #e8b931;
+  --pk-rank-a-ink: #2e2300;
+  --pk-rank-b: #b8c2d3;
+  --pk-rank-b-ink: #16213e;
+  --pk-rank-c: #c98b5a;
+  --pk-rank-c-ink: #2a1607;
+  --pk-rank-d: #66708a;
+  --pk-rank-d-ink: #ffffff;
+}
+
+/* ダーク：POSで明示したとき */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --pk-ink: #e6eaf2;
+  --pk-ink-2: #c2c9d8;
+  --pk-muted: #98a2b8;
+  --pk-subtle: #6b758c;
+  --pk-canvas: #0d111d;
+  --pk-surface: #161b2c;
+  --pk-surface-2: #1b2135;
+  --pk-surface-3: #121726;
+  --pk-glass: rgba(18, 23, 38, 0.94);
+  --pk-line: #283049;
+  --pk-line-soft: #20273b;
+  --pk-line-strong: #39425c;
+  --pk-bar: #0a0e19;
+  --pk-fill: #33457e;
+  --pk-fill-hover: #3d5193;
+  --pk-fill-soft: rgba(126, 146, 214, 0.16);
+  --pk-fill-soft-2: rgba(126, 146, 214, 0.26);
+  --pk-fill-text: #b9c6f2;
+  --pk-gold: #f0c445;
+  --pk-gold-soft: rgba(240, 196, 69, 0.12);
+  --pk-gold-line: rgba(240, 196, 69, 0.38);
+  --pk-gold-text: #f2d27a;
+  --pk-green: #34c084;
+  --pk-green-soft: rgba(52, 192, 132, 0.13);
+  --pk-green-line: rgba(52, 192, 132, 0.4);
+  --pk-red: #f2705f;
+  --pk-red-soft: rgba(242, 112, 95, 0.13);
+  --pk-red-line: rgba(242, 112, 95, 0.45);
+  --pk-blue: #8ea6ff;
+  --pk-blue-soft: rgba(142, 166, 255, 0.15);
+  --pk-link: #9db2ff;
+  --pk-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --pk-shadow-2: 0 10px 28px rgba(0, 0, 0, 0.45);
+  --pk-rank-s: #2b3a6b;
+  --pk-rank-b: #8f9bb2;
+  --pk-rank-d: #4d566d;
+}
+
+/* ダーク：お客様向けページ（data-theme なし）は端末の設定に従う */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --pk-ink: #e6eaf2;
+    --pk-ink-2: #c2c9d8;
+    --pk-muted: #98a2b8;
+    --pk-subtle: #6b758c;
+    --pk-canvas: #0d111d;
+    --pk-surface: #161b2c;
+    --pk-surface-2: #1b2135;
+    --pk-surface-3: #121726;
+    --pk-glass: rgba(18, 23, 38, 0.94);
+    --pk-line: #283049;
+    --pk-line-soft: #20273b;
+    --pk-line-strong: #39425c;
+    --pk-bar: #0a0e19;
+    --pk-fill: #33457e;
+    --pk-fill-hover: #3d5193;
+    --pk-fill-soft: rgba(126, 146, 214, 0.16);
+    --pk-fill-soft-2: rgba(126, 146, 214, 0.26);
+    --pk-fill-text: #b9c6f2;
+    --pk-gold: #f0c445;
+    --pk-gold-soft: rgba(240, 196, 69, 0.12);
+    --pk-gold-line: rgba(240, 196, 69, 0.38);
+    --pk-gold-text: #f2d27a;
+    --pk-green: #34c084;
+    --pk-green-soft: rgba(52, 192, 132, 0.13);
+    --pk-green-line: rgba(52, 192, 132, 0.4);
+    --pk-red: #f2705f;
+    --pk-red-soft: rgba(242, 112, 95, 0.13);
+    --pk-red-line: rgba(242, 112, 95, 0.45);
+    --pk-blue: #8ea6ff;
+    --pk-blue-soft: rgba(142, 166, 255, 0.15);
+    --pk-link: #9db2ff;
+    --pk-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --pk-shadow-2: 0 10px 28px rgba(0, 0, 0, 0.45);
+    --pk-rank-s: #2b3a6b;
+    --pk-rank-b: #8f9bb2;
+    --pk-rank-d: #4d566d;
+  }
+}
+
+/* ===== ブランドマーク：金地に紺の「PK」 ===== */
+.pk-mark {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--pk-gold);
+  color: var(--pk-gold-ink);
+  font-family: var(--pk-font);
+  font-size: .86rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  line-height: 1;
+}
+
+/* ===== ブランドマーク：雷雷は「雷」1文字 ===== */
+.pk-mark.is-kanji { font-size: 1.05rem; letter-spacing: 0; }
+
+/* ===== ランクタグ：鑑定ラベルのような小さな札 ===== */
+.pk-rank {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.7em;
+  height: 1.7em;
+  padding: 0 .3em;
+  border-radius: 4px;
+  background: var(--pk-rank-d);
+  color: var(--pk-rank-d-ink);
+  font-family: var(--pk-font);
+  font-size: .72rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.14);
+}
+.pk-rank[data-rank="S"] { background: var(--pk-rank-s); color: var(--pk-rank-s-ink); box-shadow: inset 0 0 0 1px var(--pk-rank-s-ink); }
+.pk-rank[data-rank="A"] { background: var(--pk-rank-a); color: var(--pk-rank-a-ink); }
+.pk-rank[data-rank="B"] { background: var(--pk-rank-b); color: var(--pk-rank-b-ink); }
+.pk-rank[data-rank="C"] { background: var(--pk-rank-c); color: var(--pk-rank-c-ink); }
+.pk-rank[data-rank="D"] { background: var(--pk-rank-d); color: var(--pk-rank-d-ink); }
+
+/* ===== 古物商の表示（お客様向けページの最下部・印刷物）。文言は rairai-config.js で設定 ===== */
+.pk-legal {
+  margin: 28px auto 0;
+  padding: 16px 0 calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--pk-line);
+  color: var(--pk-muted);
+  font-family: var(--pk-font);
+  font-size: .72rem;
+  line-height: 1.7;
+  text-align: center;
+}
+.pk-legal strong { color: var(--pk-ink-2); font-weight: 700; }
+.pk-legal .is-unset { color: var(--pk-red); }
